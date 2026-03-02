@@ -8,6 +8,8 @@ use Illuminate\Database\Seeder;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Product;
+use App\Models\ProductStock; 
+use App\Models\ProductImage; 
 
 class DatabaseSeeder extends Seeder
 {
