@@ -9,6 +9,13 @@ class Product extends Model
     use HasFactory;
    protected $fillable = ['category_id', 'brand_id', 'barcode', 'name', 'slug', 'import_price', 'sell_price', 'unit', 'description', 'status'];
     
+   // Ép kiểu dữ liệu
+    protected $casts = [
+        'status' => 'boolean',
+        'import_price' => 'decimal:2',
+        'sell_price' => 'decimal:2',
+    ];
+
     //Sản phẩm thuộc một danh mục
     public function category()
     {
@@ -30,4 +37,15 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class);
     }
+    
+    protected $appends = ['thumbnail'];
+public function getThumbnailAttribute()
+{
+    // Kiểm tra nếu image_url là link mạng (http) hay file local
+    $image = $this->images->where('is_primary', true)->first() ?? $this->images->first();
+    $path = $image?->image_url ?? 'images/no-image.png';
+    
+    // Nếu là link (picsum) thì giữ nguyên, nếu là file local thì dùng asset()
+    return str_starts_with($path, 'http') ? $path : asset($path);
+}
 }

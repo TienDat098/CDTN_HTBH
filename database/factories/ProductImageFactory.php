@@ -20,7 +20,7 @@ class ProductImageFactory extends Factory
             // Tự động gán vào 1 sản phẩm bất kỳ
             'product_id' => Product::inRandomOrder()->first()->id ?? Product::factory(),
             'image_url' => 'https://picsum.photos/400?random=' . $this->faker->randomNumber(4),
-            'is_primary' => 1,
+            'is_primary' => $this->faker->boolean(30),
         ];
     }
 }

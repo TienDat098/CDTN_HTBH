@@ -35,10 +35,16 @@ class DatabaseSeeder extends Seeder
         Brand::factory(8)->create();
 
         //  Tạo ra 50 Sản phẩm Tạp hóa. 
-        // Nhờ ORM và Factory, nó sẽ tự động nối đúng category_id và brand_id
-        Product::factory(50)
-            ->has(ProductStock::factory()->count(1), 'stock')   
-            ->has(ProductImage::factory()->count(2), 'images')  // Mỗi SP có 2 ảnh
-            ->create();
+        Product::factory(50)->create()->each(function ($product) {
+
+           $product->images()->createMany([
+            ['image_url' => fake()->imageUrl(400, 400, 'food'), 'is_primary' => 1],
+            ['image_url' => fake()->imageUrl(400, 400, 'food'), 'is_primary' => 0]
+        ]);
+
+        $product->stock()->create([
+            'quantity' => fake()->numberBetween(50, 500)
+        ]);
+    });
     }
 }
