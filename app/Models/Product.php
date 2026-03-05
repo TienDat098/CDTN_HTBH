@@ -39,13 +39,20 @@ class Product extends Model
     }
     
     protected $appends = ['thumbnail'];
-public function getThumbnailAttribute()
-{
-    // Kiểm tra nếu image_url là link mạng (http) hay file local
-    $image = $this->images->where('is_primary', true)->first() ?? $this->images->first();
-    $path = $image?->image_url ?? 'images/no-image.png';
-    
-    // Nếu là link (picsum) thì giữ nguyên, nếu là file local thì dùng asset()
-    return str_starts_with($path, 'http') ? $path : asset($path);
-}
+    public function getThumbnailAttribute()
+    {
+        $image = $this->images->where('is_primary', true)->first() ?? $this->images->first();
+        
+        if (!$image) {
+            return asset('images/no-image.png');
+        }
+
+        $path = $image->image_url;
+        
+        if (str_starts_with($path, 'http')) {
+            return $path;
+        }
+        
+        return asset('storage/' . $path);
+    }
 }

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('import_price', 15, 2);
             $table->decimal('sell_price', 15, 2);
             $table->string('unit', 50);
+            $table->string('image')->nullable(); 
             $table->longText('description')->nullable();
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
