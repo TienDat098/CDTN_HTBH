@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\InventoryLog;
 class ProductController extends Controller
 {
     /**
@@ -62,6 +63,16 @@ class ProductController extends Controller
                 'product_id'=>$product->id,
                 'quantity'=>$request->quantity
             ]);
+            //ghi log nhập kho nếu có số lượng nhập vào
+            if ($request->quantity > 0) {
+            InventoryLog::create([
+                'product_id' => $product->id,
+                'quantity' => $request->quantity,
+                'type' => 'import', 
+                'note' => 'Nhập kho lần đầu khi tạo sản phẩm',
+                'created_by' => auth()->id() ?? 1 
+            ]);
+        }
             if ($image) {
                 $product->images()->create([
                     'image_url' => $image,
@@ -109,12 +120,32 @@ class ProductController extends Controller
             'description'=>$request->description,
             'status'=>$request->status
         ]);
-
+        // Lấy số lượng cũ trước khi ghi đè
+        $oldQuantity = $product->stock->quantity ?? 0;
+        $newQuantity = $request->quantity;
+        $diff = $newQuantity - $oldQuantity;
         $product->stock()->updateOrCreate(
-            ['product_id' => $product->id], // Điều kiện tìm kiếm
-            ['quantity' => $request->quantity] // Dữ liệu cần cập nhật/thêm mới
+            ['product_id' => $product->id], 
+            ['quantity' => $newQuantity]
         );
-
+        // Kiểm tra chênh lệch để ghi log Nhập hoặc Xuất
+        if ($diff > 0) {
+            InventoryLog::create([
+                'product_id' => $product->id,
+                'quantity' => $diff,
+                'type' => 'import',
+                'note' => 'Cập nhật tăng tồn kho thủ công',
+                'created_by' => auth()->id() ?? 1
+            ]);
+        } elseif ($diff < 0) {
+            InventoryLog::create([
+                'product_id' => $product->id,
+                'quantity' => abs($diff), // abs() để lấy số dương cho quantity
+                'type' => 'export',
+                'note' => 'Cập nhật giảm tồn kho thủ công',
+                'created_by' => auth()->id() ?? 1
+            ]);
+        }
         // Xử lý Ảnh (Chỉ cập nhật nếu có chọn file mới)
     if ($request->hasFile('image')) {
         $imagePath = $request->file('image')->store('products', 'public');

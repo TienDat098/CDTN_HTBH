@@ -13,5 +13,6 @@ Route::prefix('admin')
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     Route::resource('brands', \App\Http\Controllers\Admin\BrandController::class);
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+    Route::get('inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])->name('admin.inventory.index');
 
 });
