@@ -4,6 +4,13 @@
 @section('content')
 <div class="d-flex justify-content-between mb-3">
     <h3>Lịch sử Nhập / Xuất kho</h3>
+    @if(session('success'))
+        <div class="alert alert-success mb-0 px-3 py-2">{{ session('success') }}</div>
+    @endif
+
+    <a href="{{ route('admin.inventory.create') }}" class="btn btn-success fw-bold">
+         NHẬP HÀNG MỚI
+    </a>
 </div>
 
 <table class="table table-bordered bg-white shadow-sm">
