@@ -9,8 +9,11 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Lấy 12 sản phẩm mới nhất kèm ảnh để hiển thị
-        $products = Product::with('images')->orderBy('id', 'desc')->paginate(12);
+        $products = Product::with(['images', 'stock'])
+            ->where('status', 1)
+            ->orderBy('id', 'desc')
+            ->paginate(8);
+
         return view('home', compact('products'));
     }
 }

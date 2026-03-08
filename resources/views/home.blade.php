@@ -11,7 +11,10 @@
         <div class="col-md-3 mb-4">
             <div class="card h-100">
 
-                <img src="{{ asset($product->thumbnail) }}" class="card-img-top">
+                <div style="height: 200px; overflow: hidden;">
+                    <img src="{{ $product->thumbnail }}" class="card-img-top w-100 h-100" 
+                    style="object-fit: cover;" alt="{{ $product->name }}">
+                </div>
 
                 <div class="card-body">
                     <h5 class="card-title">{{ $product->name }}</h5>

@@ -28,7 +28,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $role = $request->user()->role;
+        
+        if ($role == 'admin' || $role == 'staff') {
+            // Về trang quản trị
+            return redirect()->intended(route('admin.dashboard'));
+        }
+            // Về thẳng trang chủ
+        return redirect()->intended(route('home'));
     }
 
     /**

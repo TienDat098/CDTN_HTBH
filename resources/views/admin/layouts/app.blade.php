@@ -56,12 +56,20 @@
                     </a>
                 </li>
 
+                 <li class="nav-item mb-2">
+                    <a href="{{ route('admin.users.index') }}" 
+                       class="nav-link text-white {{ request()->routeIs('admin.users.*') ? 'fw-bold bg-secondary rounded' : '' }}">
+                          Quản lý người dùng
+                    </a>
+                </li>
+                
+
                 <li class="nav-item mt-4">
                     <a href="{{ route('home') }}" class="nav-link text-warning">
                          Về trang chủ
                     </a>
                 </li>
-
+                
             </ul>
         </div>
 
