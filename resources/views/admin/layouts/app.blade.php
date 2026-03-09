@@ -63,6 +63,12 @@
                     </a>
                 </li>
                 
+                 <li class="nav-item mb-2">
+                    <a href="{{ route('admin.orders.index') }}" 
+                       class="nav-link text-white {{ request()->routeIs('admin.orders.*') ? 'fw-bold bg-secondary rounded' : '' }}">
+                          Quản lý Đơn hàng
+                    </a>
+                </li>
 
                 <li class="nav-item mt-4">
                     <a href="{{ route('home') }}" class="nav-link text-warning">

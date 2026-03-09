@@ -35,6 +35,7 @@ Route::prefix('admin')
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show', 'create', 'store']);
         Route::get('/pos', [\App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');
         Route::post('/pos/checkout', [\App\Http\Controllers\Admin\PosController::class, 'checkout'])->name('pos.checkout');
+        Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show', 'update']);
 
     });
 require __DIR__.'/auth.php';
