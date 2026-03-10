@@ -44,11 +44,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item mb-2">
-                    <a href="#" class="nav-link text-white {{ request()->routeIs('admin.orders.*') ? 'fw-bold bg-secondary rounded' : '' }}">
-                         Đơn hàng
-                    </a>
-                </li>
+                
                 <li class="nav-item mb-2">
                     <a href="{{ route('admin.inventory.index') }}" 
                     class="nav-link text-white {{ request()->routeIs('admin.inventory.*') ? 'fw-bold bg-secondary rounded' : '' }}">

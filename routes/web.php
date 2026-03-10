@@ -36,6 +36,8 @@ Route::prefix('admin')
         Route::get('/pos', [\App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');
         Route::post('/pos/checkout', [\App\Http\Controllers\Admin\PosController::class, 'checkout'])->name('pos.checkout');
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show', 'update']);
+        Route::get('/reports/revenue', [\App\Http\Controllers\Admin\DashboardController::class, 'revenueReport'])->name('reports.revenue');
+
 
     });
 require __DIR__.'/auth.php';
