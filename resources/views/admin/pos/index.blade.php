@@ -61,16 +61,6 @@
 
         <div class="col-md-5 col-lg-4">
             <div class="card shadow-sm border-0 h-100 d-flex flex-column">
-                <div class="card-header bg-white py-3">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-person"></i></span>
-                        <select class="form-select" id="customer-select">
-                            <option value="">Khách vãng lai</option>
-                            </select>
-                        <button class="btn btn-outline-primary"><i class="bi bi-plus"></i></button>
-                    </div>
-                </div>
-
                 <div class="card-body p-0" style="flex-grow: 1; overflow-y: auto; height: 40vh;" id="pos-cart-container">
                     <table class="table table-hover mb-0 align-middle">
                         <thead class="table-light sticky-top">
@@ -91,6 +81,32 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="border-top pt-3 mb-3">
+    
+                        <div class="mb-2">
+                            <label class="form-label fw-bold small">SĐT Khách hàng (Nhập để tích/tiêu điểm)</label>
+                            <input type="text" id="customer-phone" class="form-control form-control-sm" placeholder="Ví dụ: 0912345678" oninput="debounceCheckCustomer()">
+                            
+                            <div id="customer-info" class="mt-1 d-none bg-light p-1 border rounded" style="font-size: 12px;">
+                                <span class="text-muted"><i class="bi bi-person"></i> </span><span id="c-name" class="fw-bold"></span> | 
+                                <span class="text-muted"><i class="bi bi-star-fill text-warning"></i> Điểm: </span><span id="c-points" class="fw-bold text-success">0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group input-group-sm mb-1">
+                            <span class="input-group-text bg-white fw-bold text-success">Dùng điểm</span>
+                            <input type="number" id="use-points" class="form-control text-end" min="0" value="0" oninput="calculateDiscount()">
+                            <span class="input-group-text bg-white">điểm</span>
+                        </div>
+                        <small class="text-danger d-block mb-2" style="font-size: 11px;">(1 điểm = 100đ. Tối đa giảm 30% đơn hàng)</small>
+
+                        <div class="d-flex justify-content-between text-success fw-bold mb-2">
+                            <span>Giảm giá (từ điểm):</span>
+                            <span id="discount-amount">0đ</span>
+                        </div>
+
+                    </div>
 
                 <div class="card-footer bg-white border-top-0 p-3 shadow-lg">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -231,7 +247,7 @@
                 alert('Trong kho chỉ còn ' + item.maxStock + ' sản phẩm!');
                 item.qty = item.maxStock; // Tự động set bằng số lượng tối đa kho đang có
             } 
-            // Nếu gõ đúng chuẩn
+            
             else {
                 item.qty = parsedQty;
             }
@@ -252,12 +268,12 @@
             return;
         }
 
-        // Hỏi lại thu ngân cho chắc chắn
+        
         if (!confirm('Xác nhận thanh toán đơn hàng này?')) {
             return;
         }
 
-        // Đổi chữ trên nút để báo đang xử lý
+       
         let btn = this;
         let originalText = btn.innerHTML;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
@@ -270,7 +286,11 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}' // Token bảo mật bắt buộc của Laravel
             },
-            body: JSON.stringify({ cart: posCart })
+            body: JSON.stringify({ 
+                cart: posCart,
+                phone: document.getElementById('customer-phone').value,
+                used_points: document.getElementById('use-points').value
+            })
         })
         .then(response => response.json())
         .then(data => {
@@ -289,5 +309,104 @@
             btn.disabled = false;
         });
     });
+
+    let timeoutId;
+    let currentAvailablePoints = 0; // Biến toàn cục lưu số điểm hiện có của khách
+
+    // Hàm đợi thu ngân gõ xong 0.5s mới gửi đi hỏi Server (chống lag máy chủ)
+    function debounceCheckCustomer() {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(checkCustomerPoints, 500); 
+    }
+
+    function checkCustomerPoints() {
+        let phone = document.getElementById('customer-phone').value;
+        let infoBox = document.getElementById('customer-info');
+        let usePointsInput = document.getElementById('use-points');
+
+        // Nếu gõ chưa đủ số thì ẩn bảng điểm đi
+        if (phone.length < 9) {
+            infoBox.classList.add('d-none');
+            currentAvailablePoints = 0;
+            usePointsInput.value = 0;
+            calculateDiscount();
+            return;
+        }
+
+        // Gửi SĐT lên Server hỏi điểm
+        fetch('{{ route("admin.pos.checkCustomer") }}?phone=' + phone)
+            .then(response => response.json())
+            .then(data => {
+                infoBox.classList.remove('d-none'); // Hiện bảng điểm lên
+                if (data.success) {
+                    document.getElementById('c-name').innerText = data.name;
+                    document.getElementById('c-points').innerText = data.points;
+                    currentAvailablePoints = data.points; // Lưu lại để tí nữa so sánh
+                } else {
+                    document.getElementById('c-name').innerText = 'Khách hàng mới';
+                    document.getElementById('c-points').innerText = '0';
+                    currentAvailablePoints = 0;
+                }
+                
+                // Nếu thu ngân lỡ nhập điểm dùng lớn hơn điểm khách có -> Reset ô nhập về 0
+                if (parseInt(usePointsInput.value) > currentAvailablePoints) {
+                    usePointsInput.value = 0;
+                    calculateDiscount();
+                }
+            });
+    }
+
+
+
+    function calculateDiscount() {
+        // Tính tổng tiền gốc
+        let subTotal = 0;
+        posCart.forEach(item => subTotal += (item.price * item.qty));
+
+        let pointsToUse = parseInt(document.getElementById('use-points').value);
+        if (isNaN(pointsToUse) || pointsToUse < 0) pointsToUse = 0;
+        //CHẶN DÙNG ĐIỂM VƯỢT QUÁ SỐ KHÁCH ĐANG CÓ
+        if (pointsToUse > currentAvailablePoints) {
+            alert('Khách hàng này chỉ có tối đa ' + currentAvailablePoints + ' điểm!');
+            pointsToUse = currentAvailablePoints;
+            document.getElementById('use-points').value = pointsToUse;
+        }
+
+        let discountValue = pointsToUse * 100; // 1 điểm = 100đ
+        let maxDiscountAllowed = subTotal * 0.3; // Giới hạn 30%
+
+        // Nếu nhập quá 30%, tự động kéo về mức tối đa
+        if (discountValue > maxDiscountAllowed) {
+            let maxPoints = Math.floor(maxDiscountAllowed / 100);
+            alert('Chỉ được dùng tối đa 30% đơn hàng (' + maxPoints + ' điểm)!');
+            pointsToUse = maxPoints;
+            discountValue = maxPoints * 100;
+            document.getElementById('use-points').value = maxPoints;
+        }
+
+        // Hiển thị tiền giảm giá và Tổng tiền cuối
+        document.getElementById('discount-amount').innerText = '-' + discountValue.toLocaleString('vi-VN') + 'đ';
+        let finalTotal = subTotal - discountValue;
+        document.getElementById('total-price').innerText = finalTotal.toLocaleString('vi-VN') + 'đ';
+    }
+
+
+        // bắt sự kiện khi thu ngân gõ vào ô tìm kiếm sản phẩm
+    document.getElementById('barcode-input').addEventListener('keyup', function() {
+        let keyword = this.value.toLowerCase(); // Lấy chữ thu ngân vừa gõ (chuyển thành chữ thường)
+        let productCards = document.querySelectorAll('.product-card'); // Lấy tất cả các thẻ sản phẩm
+
+        productCards.forEach(card => {
+            let productName = card.querySelector('.card-title').innerText.toLowerCase();
+            
+            // Nếu tên sản phẩm có chứa chữ vừa gõ -> Hiện lên, ngược lại -> Ẩn đi
+            if (productName.includes(keyword)) {
+                card.closest('.col-6').style.display = 'block'; // Hiển thị nguyên cả cột chứa nó
+            } else {
+                card.closest('.col-6').style.display = 'none'; // Ẩn đi
+            }
+        });
+    });
+
 </script>
 @endsection

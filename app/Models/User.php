@@ -49,4 +49,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function loyaltyPoints() {
+        return $this->hasMany(LoyaltyPoint::class, 'user_id');
+    }
+    //hàm lấy số dư điểm hiện tại của người dùng
+    public function getPointsBalanceAttribute(){
+        $lastTransaction = $this->loyaltyPoints()->orderBy('id', 'desc')->first();
+        return $lastTransaction ? $lastTransaction->balance_after : 0;
+    }
 }

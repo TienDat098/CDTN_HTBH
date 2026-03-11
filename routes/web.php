@@ -37,6 +37,7 @@ Route::prefix('admin')
         Route::post('/pos/checkout', [\App\Http\Controllers\Admin\PosController::class, 'checkout'])->name('pos.checkout');
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show', 'update']);
         Route::get('/reports/revenue', [\App\Http\Controllers\Admin\DashboardController::class, 'revenueReport'])->name('reports.revenue');
+        Route::get('/pos/check-customer', [\App\Http\Controllers\Admin\PosController::class, 'checkCustomer'])->name('pos.checkCustomer');
 
 
     });
