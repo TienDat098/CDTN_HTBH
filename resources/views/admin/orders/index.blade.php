@@ -52,8 +52,8 @@
 
                         <td class="fw-bold text-danger">{{ number_format($order->final_total) }}đ</td>
 
-                        <td>
-                            @if($order->payment_status == 'paid')
+                       <td>
+                            @if($order->payment && $order->payment->status == 'completed')
                                 <span class="badge bg-success">Đã thanh toán</span>
                             @else
                                 <span class="badge bg-warning text-dark">Chưa thanh toán</span>

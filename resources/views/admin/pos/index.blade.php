@@ -17,6 +17,14 @@
         <div class="col-md-7 col-lg-8">
             <div class="card shadow-sm border-0 mb-3">
                 <div class="card-body bg-light">
+
+                <div class="mb-2 text-end">
+                    <button class="btn btn-sm btn-outline-primary" id="btn-scan-barcode" onclick="startCamera()">
+                        <i class="bi bi-camera-video"></i> Bật Camera Quét Mã
+                    </button>
+                </div>
+    
+                <div id="reader" class="mb-3 d-none" style="width: 100%; border-radius: 8px; overflow: hidden;"></div>
                     <div class="input-group input-group-lg">
                         <span class="input-group-text bg-white"><i class="bi bi-upc-scan"></i></span>
                         <input type="text" id="barcode-input" class="form-control" placeholder="Quét mã vạch hoặc nhập tên sản phẩm..." autofocus>
@@ -34,7 +42,8 @@
                             @endphp
 
                             <div class="col-6 col-md-4 col-xl-3">
-                                <div class="card h-100 border-0 shadow-sm product-card {{ $isOutOfStock ? 'opacity-50' : '' }}" 
+                                <div class="card h-100 border-0 shadow-sm product-card {{ $isOutOfStock ? 'opacity-50' : '' }}"
+                                data-barcode="{{ $product->barcode }}" 
                                      style="cursor: {{ $isOutOfStock ? 'not-allowed' : 'pointer' }};"
                                      onclick="{{ $isOutOfStock ? '' : "addToCart({$product->id}, '{$product->name}', {$product->sell_price}, {$stock})" }}">
                                     
@@ -391,22 +400,85 @@
     }
 
 
-        // bắt sự kiện khi thu ngân gõ vào ô tìm kiếm sản phẩm
+        // bắt sự kiện khi thu ngân gõ vào ô tìm kiếm sản phẩm hoặc mã vạch, sẽ lọc sản phẩm bên dưới
     document.getElementById('barcode-input').addEventListener('keyup', function() {
-        let keyword = this.value.toLowerCase(); // Lấy chữ thu ngân vừa gõ (chuyển thành chữ thường)
-        let productCards = document.querySelectorAll('.product-card'); // Lấy tất cả các thẻ sản phẩm
+        let keyword = this.value.toLowerCase().trim(); // Lấy chữ vừa gõ, cắt khoảng trắng 2 đầu
+        let productCards = document.querySelectorAll('.product-card');
 
         productCards.forEach(card => {
             let productName = card.querySelector('.card-title').innerText.toLowerCase();
+            let productBarcode = card.getAttribute('data-barcode'); // Lấy mã vạch mình vừa nhúng vào HTML
             
-            // Nếu tên sản phẩm có chứa chữ vừa gõ -> Hiện lên, ngược lại -> Ẩn đi
-            if (productName.includes(keyword)) {
-                card.closest('.col-6').style.display = 'block'; // Hiển thị nguyên cả cột chứa nó
+            // Xử lý lỗi nếu sản phẩm nào lỡ chưa nhập mã vạch trong DB
+            if (!productBarcode) { productBarcode = ""; }
+
+            // NẾU TÊN SẢN PHẨM CHỨA TỪ KHÓA ---HOẶC--- MÃ VẠCH GIỐNG TỪ KHÓA
+            if (productName.includes(keyword) || productBarcode.includes(keyword)) {
+                card.closest('.col-6').style.display = 'block'; // Hiển thị lên
             } else {
                 card.closest('.col-6').style.display = 'none'; // Ẩn đi
             }
         });
     });
 
+        //camera barcode scanner
+    let html5QrcodeScanner;
+
+    function startCamera() {
+        const readerDiv = document.getElementById('reader');
+        const btnScan = document.getElementById('btn-scan-barcode');
+
+        // Nếu camera đang ẩn thì bật lên
+        if (readerDiv.classList.contains('d-none')) {
+            readerDiv.classList.remove('d-none');
+            btnScan.innerHTML = '<i class="bi bi-camera-video-off"></i> Tắt Camera';
+            btnScan.classList.replace('btn-outline-primary', 'btn-outline-danger');
+
+            // Khởi tạo máy quét
+            html5QrcodeScanner = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+
+            // Bật camera mặt sau (environment)
+            html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess)
+            .catch(err => {
+                alert("Lỗi: Không thể truy cập Camera. Vui lòng cấp quyền!");
+            });
+        } else {
+            // Nếu đang bật thì tắt đi
+            stopCamera();
+        }
+    }
+
+    function stopCamera() {
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.stop().then(() => {
+                document.getElementById('reader').classList.add('d-none');
+                let btnScan = document.getElementById('btn-scan-barcode');
+                btnScan.innerHTML = '<i class="bi bi-camera-video"></i> Bật Camera Quét Mã';
+                btnScan.classList.replace('btn-outline-danger', 'btn-outline-primary');
+            }).catch(err => {
+                console.log("Lỗi khi tắt camera: ", err);
+            });
+        }
+    }
+
+    // Hàm chạy khi Camera quét trúng 1 mã vạch hoặc QR
+    function onScanSuccess(decodedText, decodedResult) {
+        // Tắt camera ngay sau khi quét thành công để tránh quét liên tục 1 mã
+        stopCamera(); 
+        
+        // 1. Đưa đoạn mã vừa quét được vào ô Input
+        let searchInput = document.getElementById('barcode-input');
+        searchInput.value = decodedText;
+
+        // 2. Kích hoạt sự kiện gõ phím (keyup) để hàm lọc sản phẩm của bạn chạy
+        searchInput.dispatchEvent(new Event('keyup'));
+
+        // (Tùy chọn) Kêu tiếng bíp cho giống siêu thị
+        // let audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
+        // audio.play();
+    }
+
 </script>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 @endsection

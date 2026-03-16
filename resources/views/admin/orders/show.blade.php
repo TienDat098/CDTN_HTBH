@@ -34,7 +34,14 @@
                         {!! $order->status == 'completed' ? '<span class="badge bg-success">Hoàn thành</span>' : '<span class="badge bg-primary">Mới</span>' !!}
                     </p>
                     <p><strong>Thanh toán:</strong> 
-                        {!! $order->payment_status == 'paid' ? '<span class="text-success fw-bold">Đã thanh toán</span>' : '<span class="text-danger fw-bold">Chưa thanh toán</span>' !!}
+                        @if($order->payment && $order->payment->status == 'completed')
+                            <span class="text-success fw-bold">Đã thanh toán</span> 
+                            <span class="badge bg-light text-dark border border-secondary ms-1">
+                                {{ strtoupper($order->payment->payment_method) }}
+                            </span>
+                        @else
+                            <span class="text-danger fw-bold">Chưa thanh toán</span>
+                        @endif
                     </p>
                     <hr>
                     @if($order->order_type == 'pos')

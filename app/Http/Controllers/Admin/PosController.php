@@ -71,8 +71,16 @@ class PosController extends Controller
                 'discount_amount'=> $discountAmount,
                 'final_total'    => $finalTotal,
                 'order_type'     => 'pos',
-                'payment_status' => 'paid',
                 'status'         => 'completed',
+            ]);
+
+            DB::table('payments')->insert([
+                'order_id' => $order->id,
+                'payment_method' => 'cash', // Đơn POS tại quầy mặc định thu tiền mặt
+                'amount' => $finalTotal,
+                'status' => 'completed', // Đã thu tiền xong
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
 
             // Lưu chi tiết sản phẩm và trừ kho

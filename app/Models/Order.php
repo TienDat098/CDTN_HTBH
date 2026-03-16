@@ -26,4 +26,9 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    //1 Đơn hàng có 1 Giao dịch thanh toán
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
 }

@@ -40,16 +40,23 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+            // Không cho phép nhập trùng mã vạch đã có
+            $request->validate([
+                'barcode' => 'required|unique:products,barcode',
+            ], [
+                'barcode.unique' => 'Mã vạch này đã tồn tại trong hệ thống! Vui lòng kiểm tra lại.',
+            ]);
+
             $image = null;
             if($request->hasFile('image')){
             // Lưu ảnh vào thư mục storage/app/public/products
              $image = $request->file('image')->store('products', 'public');
             }
-            $barcode = 'SP' . time();
+            
             $product = Product::create([
                 'category_id'=>$request->category_id,
                 'brand_id'=>$request->brand_id,
-                'barcode'=>$barcode,
+                'barcode'=>$request->barcode,
                 'name'=>$request->name,
                 'slug'=>Str::slug($request->name),
                 'import_price'=>$request->import_price,

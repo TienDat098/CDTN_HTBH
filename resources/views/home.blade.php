@@ -4,6 +4,61 @@
 
 @section('content')
 
+
+<div class="row mb-4">
+
+    <!-- Slider -->
+    <div class="col-lg-8 mb-3">
+
+        <div id="homeSlider" class="carousel slide" data-bs-ride="carousel">
+
+            <div class="carousel-inner rounded shadow">
+
+                <div class="carousel-item active">
+                    <img src="{{ asset('images/banner1.jpg') }}" class="d-block w-100 slider-img">
+                </div>
+
+                <div class="carousel-item">
+                    <img src="{{ asset('images/banner2.jpg') }}" class="d-block w-100 slider-img">
+                </div>
+
+                <div class="carousel-item">
+                    <img src="{{ asset('images/banner3.jpg') }}" class="d-block w-100 slider-img">
+                </div>
+
+            </div>
+
+            <!-- nút chuyển -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#homeSlider" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+
+            <button class="carousel-control-next" type="button" data-bs-target="#homeSlider" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Banner bên phải -->
+    <div class="col-lg-4">
+
+        <div class="banner-box shadow rounded mb-3">
+            <img src="{{ asset('images/banner-right1.jpg') }}" class="w-100 banner-img">
+        </div>
+
+        <div class="banner-box shadow rounded">
+            <img src="{{ asset('images/banner-right2.jpg') }}" class="w-100 banner-img">
+        </div>
+
+    </div>
+
+</div>
+
+
+
 <h1 class="mb-4">Danh sách sản phẩm</h1>
 
 <div class="row">
