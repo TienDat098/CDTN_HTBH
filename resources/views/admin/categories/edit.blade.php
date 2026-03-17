@@ -6,7 +6,7 @@
 
 <h3 class="mb-4">Sửa danh mục</h3>
 
-<form action="{{ route('admin.categories.update', $category) }}" method="POST" class="bg-white p-4 shadow-sm">
+<form action="{{ route('admin.categories.update', $category) }}" method="POST" enctype="multipart/form-data" class="bg-white p-4 shadow-sm">
     @csrf
     @method('PUT')
 
@@ -18,6 +18,27 @@
             <small class="text-danger">{{ $message }}</small>
         @enderror
     </div>
+
+        <div class="mb-3">
+                <label class="form-label">Ảnh danh mục</label>
+
+                @if($category->image)
+                    <div class="mb-2">
+                        <img src="{{ asset('images/categories/'.$category->image) }}" 
+                            width="120" 
+                            style="border-radius:8px;">
+                    </div>
+                @endif
+
+                <img id="preview" class="mb-2" style="display:none; max-width:120px; border-radius:8px;">
+
+                <input type="file" name="image" class="form-control" onchange="previewImage(event)">
+
+                @error('image')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+        </div>
+
 
     <div class="mb-3">
         <label class="form-label">Trạng thái</label>
@@ -35,5 +56,11 @@
     <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">Quay lại</a>
 
 </form>
-
+<script>
+function previewImage(event) {
+    const img = document.getElementById('preview');
+    img.src = URL.createObjectURL(event.target.files[0]);
+    img.style.display = 'block';
+}
+</script>
 @endsection

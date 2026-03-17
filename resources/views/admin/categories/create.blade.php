@@ -6,7 +6,7 @@
 
 <h3 class="mb-4">Thêm danh mục</h3>
 
-<form action="{{ route('admin.categories.store') }}" method="POST" class="bg-white p-4 shadow-sm">
+<form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data" class="bg-white p-4 shadow-sm">
     @csrf
 
     <div class="mb-3">
@@ -16,6 +16,16 @@
             <small class="text-danger">{{ $message }}</small>
         @enderror
     </div>
+
+    <div class="mb-3">
+            <label class="form-label">Ảnh danh mục</label>
+            <img id="preview" width="100" class="mb-2" style="display:none;">
+           <input type="file" name="image" class="form-control" onchange="previewImage(event)">
+
+            @error('image')
+                <small class="text-danger">{{ $message }}</small>
+            @enderror
+        </div>
 
     <div class="mb-3">
         <label class="form-label">Trạng thái</label>
@@ -30,4 +40,12 @@
 
 </form>
 
+
+<script>
+function previewImage(event) {
+    const img = document.getElementById('preview');
+    img.src = URL.createObjectURL(event.target.files[0]);
+    img.style.display = 'block';
+}
+</script>
 @endsection

@@ -30,13 +30,19 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required|unique:categories,name']);
+        $request->validate(['name' => 'required|unique:categories,name', 'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048']);
 
-  
+        if ($request->hasFile('image')) {
+                $imageName = time().'.'.$request->image->extension();
+                $request->image->move(public_path('images/categories'), $imageName);
+            } else {
+                $imageName = null;
+            }
     Category::create([
         'name' => $request->name,
-        'slug' => Str::slug($request->name), // Tự động tạo slug từ tên
-        'status' => $request->status ?? 1
+        'slug' => Str::slug($request->name), 
+        'status' => $request->status ?? 1,
+        'image' => $imageName
     ]);
 
     return redirect()->route('admin.categories.index')->with('success', 'Thêm thành công!');
@@ -63,12 +69,25 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        $request->validate(['name' => 'required|unique:categories,name,' . $category->id]);
+        $request->validate(['name' => 'required|unique:categories,name,' . $category->id,'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048']);
+
+        $imageName = $category->image;
+
+        if ($request->hasFile('image')) {
+
+            if ($category->image && file_exists(public_path('images/categories/'.$category->image))) {
+                unlink(public_path('images/categories/'.$category->image));
+            }
+            $imageName = time().'_'.$request->image->getClientOriginalName();
+            $request->image->move(public_path('images/categories'), $imageName);
+            
+        }
 
                 $category->update([
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
-                'status' => $request->status
+                'status' => $request->status,
+                'image' => $imageName
             ]);
 
         return redirect()->route('admin.categories.index')->with('success', 'Cập nhật thành công!');

@@ -15,8 +15,10 @@
     <thead class="table-dark">
         <tr>
             <th>ID</th>
+            <th>Ảnh</th>
             <th>Tên danh mục</th>
             <th>Slug</th>
+            <th>Trạng thái</th>
             <th width="150">Hành động</th>
         </tr>
     </thead>
@@ -24,8 +26,26 @@
         @forelse($categories as $category)
             <tr>
                 <td>{{ $category->id }}</td>
+
+                 <td>
+                    <img 
+                        src="{{ $category->image 
+                            ? asset('images/categories/'.$category->image) 
+                            : asset('images/no-image.png') }}" 
+                        width="60" 
+                        height="60"
+                        style="object-fit:cover; border-radius:6px;">
+                </td>
+
                 <td>{{ $category->name }}</td>
                 <td>{{ $category->slug }}</td>
+                <td>
+                @if($category->status)
+                    <span class="badge bg-success">Hiển thị</span>
+                @else
+                    <span class="badge bg-secondary">Ẩn</span>
+                @endif
+                </td>
                 <td>
                     <a href="{{ route('admin.categories.edit', $category) }}" 
                        class="btn btn-sm btn-warning">Sửa</a>
@@ -44,7 +64,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="4" class="text-center">Chưa có dữ liệu</td>
+                <td colspan="6" class="text-center">Chưa có dữ liệu</td>
             </tr>
         @endforelse
     </tbody>
