@@ -57,6 +57,58 @@
 
 </div>
 
+<div class="container mb-4">
+    <div class="bg-white p-3 rounded shadow-sm">
+
+        <h5 class="fw-bold text-danger mb-3">
+            DANH MỤC NỔI BẬT
+        </h5>
+
+        <div class="category-list">
+            @foreach($categories as $category)
+                <a href="{{ route('category.show', $category->slug) }}" 
+                   class="text-decoration-none text-dark text-center category-item">
+
+                    <img 
+                        src="{{ $category->image 
+                            ? asset('images/categories/'.$category->image) 
+                            : asset('images/no-image.png') }}"
+                    >
+
+                    <div class="mt-2">
+                        {{ $category->name }}
+                    </div>
+
+                </a>
+            @endforeach
+        </div>
+
+    </div>
+</div>
+
+<h4 class="mb-3"> Sản phẩm bán chạy</h4>
+
+<div class="row">
+    @foreach($bestSellers as $product)
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+
+                <img src="{{ $product->thumbnail }}"  
+                     class="card-img-top"
+                     style="height:200px;object-fit:cover;">
+
+                <div class="card-body">
+                    <h6>{{ $product->name }}</h6>
+
+                    <p class="text-danger fw-bold">
+                        {{ number_format($product->sell_price) }}đ
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    @endforeach
+</div>
 
 
 <h1 class="mb-4">Danh sách sản phẩm</h1>
@@ -77,7 +129,9 @@
                     <p class="text-danger fw-bold">
                         {{ number_format($product->sell_price) }}đ
                     </p>
-
+                    <p class="text-muted mb-1">
+                        Đã bán: {{ $product->total_sold ?? 0 }}
+                    </p>
                     <button class="btn btn-success w-100">
                         Thêm vào giỏ
                     </button>
@@ -90,4 +144,33 @@
 <div class="d-flex justify-content-center mt-4">
     {{ $products->links('pagination::bootstrap-5') }}
 </div>
+<style>
+
+
+.category-list {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+}
+
+.category-item {
+    width: 100px;
+    text-align: center;
+}
+
+.category-item img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #eee;
+    padding: 5px;
+    background: #fff;
+}
+.category-item:hover {
+    color: #ee4d2d;
+     transform: translateY(-5px);
+    transition: 0.3s;
+}
+</style>
 @endsection

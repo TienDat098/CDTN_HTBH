@@ -55,4 +55,8 @@ class Product extends Model
         
         return asset('storage/' . $path);
     }
+            public function orderItems()
+        {
+            return $this->hasMany(\App\Models\OrderItem::class);
+        }
 }

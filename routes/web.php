@@ -3,11 +3,15 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 
 
  //Trang chủ 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+//Danh mục sản phẩm
+Route::get('/danh-muc/{slug}', [CategoryController::class, 'show'])
+    ->name('category.show');
  // Dashboard 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -39,6 +43,6 @@ Route::prefix('admin')
         Route::get('/reports/revenue', [\App\Http\Controllers\Admin\DashboardController::class, 'revenueReport'])->name('reports.revenue');
         Route::get('/pos/check-customer', [\App\Http\Controllers\Admin\PosController::class, 'checkCustomer'])->name('pos.checkCustomer');
 
+});
 
-    });
 require __DIR__.'/auth.php';

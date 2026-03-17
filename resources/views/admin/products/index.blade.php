@@ -7,7 +7,7 @@
 <div class="d-flex justify-content-between mb-3">
     <h3>Quản lý sản phẩm</h3>
     <a href="{{ route('admin.products.create') }}" class="btn btn-success">
-        + Thêm sản phẩm
+         Thêm sản phẩm
     </a>
 </div>
 
