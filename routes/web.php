@@ -5,13 +5,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
-
+ use App\Http\Controllers\CartController;
 
  //Trang chủ 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 //Danh mục sản phẩm
 Route::get('/danh-muc/{slug}', [CategoryController::class, 'show'])
     ->name('category.show');
+ // Thêm sản phẩm vào giỏ hàng qua Ajax
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+// Route xem chi tiết sản phẩm
+Route::get('/san-pham/{slug}', [App\Http\Controllers\HomeController::class, 'show'])->name('product.show');
  // Dashboard 
 Route::get('/dashboard', function () {
     return view('dashboard');

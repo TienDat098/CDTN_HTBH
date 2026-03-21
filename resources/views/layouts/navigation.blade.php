@@ -19,22 +19,22 @@
 
         <ul class="dropdown-menu category-menu shadow border-0">
 
-@foreach($globalCategories as $category)
+            @foreach($globalCategories as $category)
 
-<li>
-<a class="dropdown-item d-flex align-items-center gap-2" 
-   href="#">
+            <li>
+            <a class="dropdown-item d-flex align-items-center gap-2" 
+            href="#">
 
-<i class="bi bi-tag"></i>
+            <i class="bi bi-tag"></i>
 
-{{ $category->name }}
+            {{ $category->name }}
 
-</a>
-</li>
+            </a>
+            </li>
 
-@endforeach
+            @endforeach
 
-</ul>
+        </ul>
        
 
     </div>
@@ -59,15 +59,53 @@
 
 
     <!-- Account -->
-    <div class="nav-icon">
+    <div class="nav-icon dropdown">
+        
+        @auth
+            <a href="#" class="icon-box dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle text-warning"></i>
+                <div>
+                    <small>Xin chào,</small><br>
+                    <span class="fw-bold">{{ Auth::user()->name }}</span>
+                </div>
+            </a>
+            
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'staff')
+                    <li>
+                        <a class="dropdown-item py-2 fw-bold text-primary" href="{{ route('admin.dashboard') }}">
+                            <i class="bi bi-speedometer2 me-2"></i>Trang quản trị
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                @else
+                    <li>
+                        <a class="dropdown-item py-2 fw-bold text-primary" href="{{ route('dashboard') }}">
+                            <i class="bi bi-person-vcard me-2"></i>Trang cá nhân
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                @endif
+                
+                <li>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button class="dropdown-item py-2 text-danger" type="submit">
+                            <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                        </button>
+                    </form>
+                </li>
+            </ul>
 
-        <a href="{{ route('login') }}" class="icon-box">
-            <i class="bi bi-person"></i>
-            <div>
-                <small>Đăng nhập / Đăng ký</small><br>
-                <span>Tài khoản</span>
-            </div>
-        </a>
+        @else
+            <a href="{{ route('login') }}" class="icon-box">
+                <i class="bi bi-person"></i>
+                <div>
+                    <small>Đăng nhập / Đăng ký</small><br>
+                    <span>Tài khoản</span>
+                </div>
+            </a>
+        @endauth
 
     </div>
 
@@ -75,11 +113,13 @@
     <!-- Cart -->
     <div class="nav-icon">
 
-        <a href="#" class="icon-box cart-box">
+        <a href="{{ route('cart.index') }}" class="icon-box cart-box">
 
             <div class="cart-icon">
                 <i class="bi bi-cart"></i>
-                <span class="cart-count">0</span>
+               <span class="cart-count">
+                    {{ session('cart') ? array_sum(array_column(session('cart'), 'quantity')) : 0 }}
+                </span>
             </div>
 
             <div>
@@ -91,7 +131,7 @@
 
     </div>
 
-</div>
+  </div>
 </nav>
 
 <style>
@@ -207,4 +247,45 @@
 .category-btn i{
 font-size:24px;
 }
+
+
+
+/*nav chỗ đăng nhập*/
+
+.nav-icon .dropdown-menu {
+    z-index: 1050 !important;
+}
+
+
+@media (min-width: 992px) {
+    .dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0;
+        top: 100%; 
+    }
+    
+    
+    .dropdown:hover .dropdown-menu::before {
+        content: "";
+        position: absolute;
+        top: -15px; 
+        left: 0;
+        width: 100%;
+        height: 15px;
+        background: transparent;
+    }
+}
+
+
+.dropdown-item form {
+    margin: 0;
+}
+.dropdown-item form button {
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 0;
+}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

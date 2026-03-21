@@ -51,8 +51,8 @@
 
     <td>
 
-    <a href="{{ route('admin.products.edit',$product) }}"
-    class="btn btn-warning btn-sm">Sửa</a>
+    <a href="{{ route('admin.products.edit', ['product' => $product, 'page' => request()->page]) }}"
+   class="btn btn-warning btn-sm">Sửa</a>
 
     <form action="{{ route('admin.products.destroy',$product) }}"
     method="POST"

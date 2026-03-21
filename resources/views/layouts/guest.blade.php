@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -26,5 +27,7 @@
                 {{ $slot }}
             </div>
         </div>
+        <body>
+
     </body>
 </html>

@@ -33,4 +33,13 @@ class HomeController extends Controller
 
         return view('home', compact('products','categories','bestSellers'));
     }
+    public function show($slug)
+    {
+        
+        $product = \App\Models\Product::with(['variants' => function($query) {
+            $query->where('status', 1);
+        }, 'brand', 'category'])->where('slug', $slug)->firstOrFail();
+
+        return view('product.show', compact('product'));
+    }
 }

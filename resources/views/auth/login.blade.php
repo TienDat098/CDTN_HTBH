@@ -1,47 +1,90 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+@extends('layouts.app')
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+@section('title', 'Đăng nhập - Web Tạp Hóa')
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+@section('content')
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow border-0 rounded-4">
+                
+                <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>ĐĂNG NHẬP
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    
+                    <x-auth-session-status class="mb-4 text-success fw-bold text-center" :status="session('status')" />
+
+                    <form method="POST" action="{{ route('login') }}">
+                        @csrf
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-bold text-dark">Địa chỉ Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-danger border-end-0">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </span>
+                                <input id="email" type="email" class="form-control border-start-0 ps-0 @error('email') is-invalid @enderror" 
+                                       name="email" value="{{ old('email') }}" required autofocus placeholder="Nhập email của bạn...">
+                            </div>
+                            <x-input-error :messages="$errors->get('email')" class="text-danger mt-1 small" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-bold text-dark">Mật khẩu</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-danger border-end-0">
+                                    <i class="bi bi-lock-fill"></i>
+                                </span>
+                                <input id="password" type="password" class="form-control border-start-0 ps-0 @error('password') is-invalid @enderror" 
+                                       name="password" required placeholder="Nhập mật khẩu...">
+                            </div>
+                            <x-input-error :messages="$errors->get('password')" class="text-danger mt-1 small" />
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="remember" id="remember_me">
+                                <label class="form-check-label text-muted" for="remember_me">
+                                    Ghi nhớ tài khoản
+                                </label>
+                            </div>
+                            
+                            @if (Route::has('password.request'))
+                                <a href="{{ route('password.request') }}" class="text-danger text-decoration-none small fw-bold hover-underline">
+                                    Quên mật khẩu?
+                                </a>
+                            @endif
+                        </div>
+
+                        <button class="btn btn-warning w-100 fw-bold py-2 mb-3 shadow-sm fs-5" type="submit">
+                            ĐĂNG NHẬP
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-3 pt-3 border-top">
+                        <span class="text-muted">Bạn chưa có tài khoản?</span>
+                        <a href="{{ route('register') }}" class="text-success fw-bold text-decoration-none ms-1 hover-underline">
+                            Đăng ký ngay
+                        </a>
+                    </div>
+
+                </div>
+            </div>
         </div>
+    </div>
+</div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+<style>
+    .form-control:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+    .hover-underline:hover {
+        text-decoration: underline !important;
+    }
+</style>
+@endsection

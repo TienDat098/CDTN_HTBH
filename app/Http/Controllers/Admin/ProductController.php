@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\ProductStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\ProductVariant;
 use App\Models\InventoryLog;
 class ProductController extends Controller
 {
@@ -40,7 +41,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-            // Không cho phép nhập trùng mã vạch đã có
+            
             $request->validate([
                 'barcode' => 'required|unique:products,barcode',
             ], [
@@ -49,7 +50,6 @@ class ProductController extends Controller
 
             $image = null;
             if($request->hasFile('image')){
-            // Lưu ảnh vào thư mục storage/app/public/products
              $image = $request->file('image')->store('products', 'public');
             }
             
@@ -87,6 +87,28 @@ class ProductController extends Controller
                 ]);
             }
 
+                    // XỬ LÝ BIẾN THỂ NẾU CÓ
+                if ($request->has('variants')) {
+                    foreach ($request->variants as $var) {
+                        // Nếu người dùng có nhập tên biến thể thì mới lưu
+                        if (!empty($var['name'])) {
+                            $variant = $product->variants()->create([
+                                'name' => $var['name'],
+                                'barcode' => $var['barcode'] ?? null,
+                                'price' => $var['price'] ?? 0,
+                                'stock_quantity' => $var['stock_quantity'] ?? 0,
+                                'status' => 1
+                            ]);
+
+                            // Ghi nhận kho cho biến thể
+                            ProductStock::create([
+                                'product_id' => $product->id,
+                                'variant_id' => $variant->id,
+                                'quantity' => $var['stock_quantity'] ?? 0
+                            ]);
+                        }
+                    }
+                }
             return redirect()->route('admin.products.index')
                 ->with('success','Thêm sản phẩm thành công');
     }
@@ -106,7 +128,7 @@ class ProductController extends Controller
     {
         $categories = Category::all();
         $brands = Brand::all();
-
+        $product->load('variants');
         return view('admin.products.edit', compact('product','categories','brands'));
     }
 
@@ -141,7 +163,7 @@ class ProductController extends Controller
                 'product_id' => $product->id,
                 'quantity' => $diff,
                 'type' => 'import',
-                'note' => 'Cập nhật tăng tồn kho thủ công',
+                'note' => 'Cập nhật tăng tồn kho gốc',
                 'created_by' => auth()->id() ?? 1
             ]);
         } elseif ($diff < 0) {
@@ -149,11 +171,11 @@ class ProductController extends Controller
                 'product_id' => $product->id,
                 'quantity' => abs($diff), // abs() để lấy số dương cho quantity
                 'type' => 'export',
-                'note' => 'Cập nhật giảm tồn kho thủ công',
+                'note' => 'Cập nhật giảm tồn kho gốc',
                 'created_by' => auth()->id() ?? 1
             ]);
         }
-        // Xử lý Ảnh (Chỉ cập nhật nếu có chọn file mới)
+        // Xử lý Ảnh 
     if ($request->hasFile('image')) {
         $imagePath = $request->file('image')->store('products', 'public');
         $primaryImage = $product->images()->where('is_primary', 1)->first();
@@ -167,8 +189,59 @@ class ProductController extends Controller
             ]);
         }
     }
-        return redirect()->route('admin.products.index')
-            ->with('success','Cập nhật sản phẩm thành công');
+
+        // XỬ LÝ CẬP NHẬT BIẾN THỂ 
+        if ($request->has('variants')) {
+            $keptVariantIds = [];
+
+            foreach ($request->variants as $var) {
+                if (!empty($var['name'])) {
+                    if (isset($var['id'])) {
+                        // Cập nhật biến thể cũ
+                        $variant = ProductVariant::find($var['id']);
+                        if($variant) {
+                            $variant->update([
+                                'name' => $var['name'],
+                                'barcode' => $var['barcode'] ?? null,
+                                'price' => $var['price'] ?? 0,
+                                'stock_quantity' => $var['stock_quantity'] ?? 0,
+                            ]);
+                            $keptVariantIds[] = $variant->id;
+
+                            // Cập nhật kho của biến thể
+                            ProductStock::updateOrCreate(
+                                ['product_id' => $product->id, 'variant_id' => $variant->id],
+                                ['quantity' => $var['stock_quantity'] ?? 0]
+                            );
+                        }
+                    } else {
+                        // Tạo biến thể mới
+                        $newVariant = $product->variants()->create([
+                            'name' => $var['name'],
+                            'barcode' => $var['barcode'] ?? null,
+                            'price' => $var['price'] ?? 0,
+                            'stock_quantity' => $var['stock_quantity'] ?? 0,
+                            'status' => 1
+                        ]);
+                        $keptVariantIds[] = $newVariant->id;
+                        
+                        ProductStock::create([
+                            'product_id' => $product->id,
+                            'variant_id' => $newVariant->id,
+                            'quantity' => $var['stock_quantity'] ?? 0
+                        ]);
+                    }
+                }
+            }
+           
+            $product->variants()->whereNotIn('id', $keptVariantIds)->update(['status' => 0]);
+        } else {
+            
+            $product->variants()->update(['status' => 0]);
+        }
+
+        return redirect()->route('admin.products.index', ['page' => $request->page])
+                     ->with('success', 'Cập nhật sản phẩm thành công!');
     }
 
     /**

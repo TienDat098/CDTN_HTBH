@@ -132,8 +132,8 @@
                     <p class="text-muted mb-1">
                         Đã bán: {{ $product->total_sold ?? 0 }}
                     </p>
-                    <button class="btn btn-success w-100">
-                        Thêm vào giỏ
+                    <button class="btn btn-success w-100 add-to-cart-btn" data-id="{{ $product->id }}">
+                        <i class="bi bi-cart-plus"></i> Thêm vào giỏ
                     </button>
                 </div>
 
@@ -173,4 +173,57 @@
     transition: 0.3s;
 }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tìm tất cả các nút Thêm vào giỏ hàng
+    const addBtnList = document.querySelectorAll('.add-to-cart-btn');
+
+    addBtnList.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            let productId = this.getAttribute('data-id');
+            let btn = this;
+            let originalText = btn.innerHTML;
+
+            // 1. Hiệu ứng lúc đang bấm (Loading)
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+            btn.disabled = true;
+
+            // 2. Gửi lệnh ngầm qua Ajax (Fetch API)
+            fetch('{{ route('cart.add') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ product_id: productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // 3. Cập nhật con số trên giỏ hàng cái BÍP
+                    document.querySelector('.cart-count').innerText = data.cart_count;
+                    
+                    // 4. Hiệu ứng thêm thành công (Đổi sang màu vàng)
+                    btn.innerHTML = '<i class="bi bi-check-lg"></i> Đã thêm';
+                    btn.classList.replace('btn-success', 'btn-warning');
+
+                    // 5. Trả lại nút bình thường sau 1.5 giây để khách bấm tiếp
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.replace('btn-warning', 'btn-success');
+                        btn.disabled = false;
+                    }, 1500);
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        });
+    });
+});
+</script>
 @endsection
