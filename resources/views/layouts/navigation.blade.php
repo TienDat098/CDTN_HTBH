@@ -80,8 +80,13 @@
                     <li><hr class="dropdown-divider"></li>
                 @else
                     <li>
-                        <a class="dropdown-item py-2 fw-bold text-primary" href="{{ route('dashboard') }}">
-                            <i class="bi bi-person-vcard me-2"></i>Trang cá nhân
+                        <a class="dropdown-item py-2 fw-bold text-primary" href="{{ route('profile.edit') }}">
+                            <i class="bi bi-person-vcard me-2"></i>Hồ sơ cá nhân
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2 fw-bold text-secondary" href="{{ route('profile.orders') }}">
+                            <i class="bi bi-box-seam me-2"></i>Lịch sử đơn mua
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>

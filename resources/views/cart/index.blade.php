@@ -114,7 +114,7 @@
                             <span class="fw-bold fs-3 text-danger">{{ number_format($total) }}đ</span>
                         </div>
 
-                        <a href="#" class="btn btn-warning w-100 fw-bold py-3 fs-5 shadow-sm text-dark btn-thanh-toan">
+                        <a href="{{ route('checkout.index') }}" class="btn btn-warning w-100 fw-bold py-3 fs-5 shadow-sm text-dark btn-thanh-toan">
                             TIẾN HÀNH THANH TOÁN
                         </a>
                     </div>
