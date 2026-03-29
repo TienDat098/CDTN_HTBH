@@ -22,13 +22,9 @@
             @foreach($globalCategories as $category)
 
             <li>
-            <a class="dropdown-item d-flex align-items-center gap-2" 
-            href="#">
-
-            <i class="bi bi-tag"></i>
-
-            {{ $category->name }}
-
+            <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('category.show', $category->slug) }}">
+                <i class="bi bi-tag"></i>
+                {{ $category->name }}
             </a>
             </li>
 
