@@ -9,7 +9,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\UserOrderController;
-
+use App\Http\Controllers\ProductController as ClientProductController;
  //Trang chủ 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 //Danh mục sản phẩm
@@ -27,7 +27,8 @@ Route::get('/san-pham/{slug}', [App\Http\Controllers\HomeController::class, 'sho
 Route::get('/thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/thanh-toan', [CheckoutController::class, 'process'])->name('checkout.process');
 Route::get('/dat-hang-thanh-cong', [CheckoutController::class, 'success'])->name('checkout.success');
-
+// Route mới trỏ vào ClientProductController
+Route::get('/san-pham/{slug}', [ClientProductController::class, 'show'])->name('product.show');
  // Dashboard 
 Route::get('/dashboard', function () {
     return view('dashboard');
