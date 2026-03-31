@@ -8,7 +8,8 @@
         <div class="col-md-5">
             <div class="card shadow border-0 rounded-4">
                 
-                <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+
                     <h4 class="mb-0 fw-bold">
                         <i class="bi bi-box-arrow-in-right me-2"></i>ĐĂNG NHẬP
                     </h4>
@@ -24,7 +25,8 @@
                         <div class="mb-3">
                             <label for="email" class="form-label fw-bold text-dark">Địa chỉ Email</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light text-danger border-end-0">
+                                <span class="input-group-text bg-light text-primary border-end-0">
+
                                     <i class="bi bi-envelope-fill"></i>
                                 </span>
                                 <input id="email" type="email" class="form-control border-start-0 ps-0 @error('email') is-invalid @enderror" 
@@ -60,14 +62,14 @@
                             @endif
                         </div>
 
-                        <button class="btn btn-warning w-100 fw-bold py-2 mb-3 shadow-sm fs-5" type="submit">
+                        <button class="btn btn-primary w-100 fw-bold py-2 mb-3 shadow-sm fs-5" type="submit">
                             ĐĂNG NHẬP
                         </button>
                     </form>
 
                     <div class="text-center mt-3 pt-3 border-top">
                         <span class="text-muted">Bạn chưa có tài khoản?</span>
-                        <a href="{{ route('register') }}" class="text-success fw-bold text-decoration-none ms-1 hover-underline">
+                        <a href="{{ route('register') }}" class="text-primary fw-bold text-decoration-none ms-1 hover-underline">
                             Đăng ký ngay
                         </a>
                     </div>
@@ -80,11 +82,16 @@
 
 <style>
     .form-control:focus {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
-    }
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
     .hover-underline:hover {
         text-decoration: underline !important;
     }
+    .card {
+    border: 1px solid #dbeafe;
+}
+
 </style>
 @endsection

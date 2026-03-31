@@ -10,6 +10,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\UserOrderController;
 use App\Http\Controllers\ProductController as ClientProductController;
+use App\Http\Controllers\SearchController;
  //Trang chủ 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 //Danh mục sản phẩm
@@ -33,6 +34,10 @@ Route::get('/san-pham/{slug}', [ClientProductController::class, 'show'])->name('
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware('auth')->name('dashboard');
+// Search 
+Route::get('/search/suggest', [SearchController::class, 'suggest']);
+// Route cho trang kết quả tìm kiếm chính
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
  // Profile 
 Route::middleware('auth')->group(function () {

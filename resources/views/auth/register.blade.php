@@ -8,7 +8,7 @@
         <div class="col-md-8">
             <div class="card shadow border-0 rounded-4">
                 
-                <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
                     <h4 class="mb-0 fw-bold">
                         <i class="bi bi-person-plus-fill me-2"></i>ĐĂNG KÝ TÀI KHOẢN
                     </h4>
@@ -100,14 +100,14 @@
 
                         </div>
 
-                        <button class="btn btn-warning w-100 fw-bold py-2 mb-3 shadow-sm fs-5" type="submit">
+                        <button class="btn btn-primary w-100 fw-bold py-2 mb-3 shadow-sm fs-5" type="submit">
                             HOÀN TẤT ĐĂNG KÝ
                         </button>
                     </form>
 
                     <div class="text-center mt-3 pt-3 border-top">
                         <span class="text-muted">Đã có tài khoản?</span>
-                        <a href="{{ route('login') }}" class="text-danger fw-bold text-decoration-none ms-1 hover-underline">
+                        <a href="{{ route('login') }}" class="text-primary fw-bold text-decoration-none ms-1 hover-underline">
                             Đăng nhập ngay
                         </a>
                     </div>

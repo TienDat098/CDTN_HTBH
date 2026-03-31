@@ -8,7 +8,7 @@
         <div class="col-md-5">
             <div class="card shadow border-0 rounded-4">
                 
-                <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
                     <h4 class="mb-0 fw-bold">
                         <i class="bi bi-shield-lock-fill me-2"></i>QUÊN MẬT KHẨU
                     </h4>
@@ -37,14 +37,14 @@
                             <x-input-error :messages="$errors->get('email')" class="text-danger mt-1 small" />
                         </div>
 
-                        <button class="btn btn-warning w-100 fw-bold py-2 mb-3 shadow-sm" style="font-size: 1.1rem;" type="submit">
+                        <button class="btn btn-primary w-100 fw-bold py-2 mb-3 shadow-sm" style="font-size: 1.1rem;" type="submit">
                             <i class="bi bi-send-fill me-2"></i>GỬI LINK KHÔI PHỤC
                         </button>
                     </form>
 
                     <div class="text-center mt-3 pt-3 border-top">
                         <span class="text-muted">Chợt nhớ ra mật khẩu?</span>
-                        <a href="{{ route('login') }}" class="text-success fw-bold text-decoration-none ms-1 hover-underline">
+                        <a href="{{ route('login') }}" class="text-primary fw-bold text-decoration-none ms-1 hover-underline">
                             Quay lại Đăng nhập
                         </a>
                     </div>

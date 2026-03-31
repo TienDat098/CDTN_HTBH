@@ -37,21 +37,27 @@
 
 
     <!-- Logo -->
-    <a class="navbar-brand fw-bold fs-3 text-warning me-4" href="/">
+    <a class="navbar-brand fw-bold fs-3 text-primary me-4" href="/">
+
         WebTapHoa
     </a>
 
+          <!-- Search Box -->
+<div class="d-flex flex-grow-1 justify-content-center"> 
+    <div class="search-wrapper position-relative w-100" style="max-width: 500px;">
+        <form action="{{ route('search.index') }}" method="GET" class="search-box">
+            <input type="text" name="keyword" id="search-input" placeholder="Tìm kiếm sản phẩm..." autocomplete="off">
+            <button type="submit">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+        <!-- Khung gợi ý được đưa ra ngoài form -->
+        <div id="search-suggest" class="search-suggest"></div>
+    </div>
+</div>
 
-    <!-- Search -->
-    <form class="search-box flex-grow-1 mx-3">
 
-        <input type="text" placeholder="Tìm kiếm sản phẩm...">
 
-        <button type="submit">
-            <i class="bi bi-search"></i> Tìm kiếm
-        </button>
-
-    </form>
 
 
     <!-- Account -->
@@ -138,18 +144,24 @@
 <style>
    /* Navbar đỏ */
 .main-navbar{
-    background:#ef1c1c;
+    background:#eff6ff;
     padding:12px 0;
+    border-bottom:1px solid #dbeafe;
 }
+
 
 /* Nút danh mục */
 .category-btn{
-    background:#ef1c1c;
-    color:white;
+    background:#dbeafe;
+    color:#1e3a8a;
     text-decoration:none;
     padding:8px 12px;
     border-radius:6px;
     font-weight:600;
+}
+
+.category-btn:hover{
+    background:#bfdbfe;
 }
 
 .category-btn small{
@@ -178,40 +190,43 @@
     padding-left:22px;
 }
 
-/* Search box */
-.search-box{
-    display:flex;
-    background:white;
-    border-radius:4px;
-    overflow:hidden;
+.search-box {
+    display: flex;
+    background: white;
+    border-radius: 6px;
+    overflow: hidden; /* Bo góc mượt mà */
+    border: 1px solid #dbeafe;
+    width: 100%;
 }
 
-.search-box input{
-    border:none;
-    padding:10px;
-    width:100%;
-    outline:none;
+.search-box input {
+    border: none;
+    padding: 10px 15px;
+    width: 100%;
+    outline: none;
 }
 
-.search-box button{
-    background:#ffc107;
-    border:none;
-    padding:0 18px;
-    font-weight:600;
+.search-box button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    font-weight: 600;
 }
+
 
 /* Icon account cart */
 .icon-box{
     display:flex;
     align-items:center;
     gap:8px;
-    color:white;
+    color:#1e3a8a;
     text-decoration:none;
     margin-left:20px;
 }
 
-.icon-box i{
-    font-size:26px;
+.icon-box:hover{
+    color:#3b82f6;
 }
 
 /* Cart */
@@ -223,12 +238,13 @@
     position:absolute;
     top:-6px;
     right:-10px;
-    background:#ffc107;
-    color:black;
+    background:#3b82f6;
+    color:white;
     font-size:12px;
     border-radius:50%;
     padding:2px 6px;
 }
+
 
 @media (min-width:992px){
 
@@ -288,5 +304,130 @@ font-size:24px;
     text-align: left;
     padding: 0;
 }
+
+/*search suggest*/
+.search-suggest {
+    position: absolute;
+    top: calc(100% + 5px); /* Nằm ngay dưới thanh search, cách 5px */
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    z-index: 9999; 
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); /* Đổ bóng nổi bật */
+    max-height: 400px;
+    overflow-y: auto;
+    display: none; 
+}
+
+/* Từng item trong danh sách */
+.search-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.search-item:last-child {
+    border-bottom: none;
+}
+
+.search-item:hover {
+    background: #f8fafc;
+}
+.search-item img {
+    width: 45px;
+    height: 45px;
+    object-fit: contain; /* Giữ nguyên tỷ lệ ảnh */
+    border-radius: 4px;
+    background-color: #fff;
+    border: 1px solid #eee;
+}
+
+/* Thông tin sản phẩm */
+.search-item-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.search-item-info .product-name {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Thêm dấu ... nếu tên quá dài */
+    margin-bottom: 4px;
+}
+
+.search-item-info .price {
+    color: #dc3545; /* Màu đỏ cho giá */
+    font-weight: 700;
+    font-size: 13px;
+}
+
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('search-input');
+    const box = document.getElementById('search-suggest');
+
+    if(!input) return;
+
+    input.addEventListener('keyup', function() {
+        let keyword = this.value.trim();
+
+        if(keyword.length < 2){
+            box.style.display = 'none';
+            box.innerHTML = '';
+            return;
+        }
+
+        // CHÚ Ý: Dùng dấu backtick (`) để bọc URL và HTML
+        fetch(`/search/suggest?keyword=${keyword}`)
+            .then(res => res.json())
+            .then(data => {
+                let html = '';
+                if(data.length > 0) {
+                    data.forEach(item => {
+                        let formattedPrice = new Intl.NumberFormat('vi-VN').format(item.price);
+                        
+                        html += `
+                            <div class="search-item" onclick="window.location='/san-pham/${item.slug}'">
+                                <img src="${item.thumbnail}" onerror="this.src='/images/no-image.png'">
+                                <div class="search-item-info">
+                                    <span class="product-name">${item.name}</span>
+                                    <span class="price">${formattedPrice} đ</span>
+                                </div>
+                            </div>
+                        `;                    
+                    });
+                    box.innerHTML = html;
+                    box.style.display = 'block';
+                }
+                 else {
+                    box.innerHTML = `<div class="p-3 text-muted text-center"><small>Không tìm thấy sản phẩm</small></div>`;
+                    box.style.display = 'block';
+                }
+            })
+            .catch(err => console.error("Lỗi search:", err));
+    });
+
+    // Ẩn box khi click ra ngoài
+    document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !box.contains(e.target)) {
+            box.style.display = 'none';
+        }
+    });
+});
+</script>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
