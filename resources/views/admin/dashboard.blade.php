@@ -183,84 +183,82 @@
 
 </div>
 
-<hr class="mt-5">
+        <hr class="mt-5">
 
-    <div class="row mt-4">
+            <div class="row mt-4">
 
-    <div class="col-md-6">
+            <div class="col-md-6">
 
-    <h4>Top 5 sản phẩm bán chạy</h4>
+            <h4>Top 5 sản phẩm bán chạy</h4>
 
-<table class="table table-bordered">
+        <table class="table table-bordered">
 
-    <thead>
-        <tr>
-        <th>#</th>
-        <th>Sản phẩm</th>
-        <th>Số lượng bán</th>
-        </tr>
-    </thead>
+            <thead>
+                <tr>
+                <th>#</th>
+                <th>Sản phẩm</th>
+                <th>Số lượng bán</th>
+                </tr>
+            </thead>
 
-<tbody>
+        <tbody>
 
-@foreach($topProducts as $index => $product)
+            @foreach($topProducts as $index => $product)
 
-    <tr>
-        <td>{{ $index + 1 }}</td>
-        <td>{{ $product->name }}</td>
-        <td>{{ $product->total }}</td>
-    </tr>
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $product->name }}</td>
+                    <td>{{ $product->total }}</td>
+                </tr>
 
-@endforeach
+            @endforeach
 
-</tbody>
+        </tbody>
 
-</table>
+    </table>
 
-</div>
-
-
-<div class="col-md-6">
-
-<h4>Biểu đồ Top sản phẩm</h4>
-
-<div style="height:350px">
-<canvas id="topProductChart"></canvas>
-</div>
-
-</div>
-
-</div>
-
-<hr class="mt-5">
+    </div>
 
 
+            <div class="col-md-6">
 
-<h4>Sản phẩm sắp hết hàng (tồn < 10)</h4>
+                    <h4>Biểu đồ Top sản phẩm</h4>
 
-<table class="table table-bordered">
+                    <div style="height:350px">
+                    <canvas id="topProductChart"></canvas>
+                    </div>
 
-<thead>
-<tr>
-<th>#</th>
-<th>Sản phẩm</th>
-<th>Tồn kho</th>
-</tr>
-</thead>
+                    </div>
 
-<tbody>
+            </div>
 
-@foreach($lowStockProducts as $index => $product)
+    <hr class="mt-5">
 
-<tr>
-<td>{{ $index + 1 }}</td>
-<td>{{ $product->name }}</td>
-<td class="text-danger">{{ $product->quantity }}</td>
-</tr>
+            <h4>Sản phẩm sắp hết hàng (tồn < 10)</h4>
 
-@endforeach
+            <table class="table table-bordered">
 
-</tbody>
+            <thead>
+                <tr>
+                <th>#</th>
+                <th>Sản phẩm</th>
+                <th>Tồn kho</th>
+                </tr>
+            </thead>
+
+        <tbody>
+
+                @foreach($lowStockProducts as $index => $product)
+
+                <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $product->name }}</td>
+                <td class="text-danger">{{ $product->quantity }}</td>
+                </tr>
+
+                @endforeach
+
+        </tbody>
 
 </table>
 
@@ -268,75 +266,75 @@
 
 <script>
 
-const dayLabels = @json($revenueByDay->pluck('date'));
-const dayData = @json($revenueByDay->pluck('total'));
+            const dayLabels = @json($revenueByDay->pluck('date'));
+            const dayData = @json($revenueByDay->pluck('total'));
 
-new Chart(document.getElementById('revenueDayChart'), {
+            new Chart(document.getElementById('revenueDayChart'), {
 
-type:'line',
+            type:'line',
 
-data:{
-labels:dayLabels,
-datasets:[{
-label:'Doanh thu',
-data:dayData,
-borderColor:'blue',
-backgroundColor:'rgba(0,0,255,0.1)',
-tension:0.4
-}]
-},
+            data:{
+            labels:dayLabels,
+            datasets:[{
+            label:'Doanh thu',
+            data:dayData,
+            borderColor:'blue',
+            backgroundColor:'rgba(0,0,255,0.1)',
+            tension:0.4
+            }]
+            },
 
-options:{
-responsive:true,
-maintainAspectRatio:false
-}
+            options:{
+            responsive:true,
+            maintainAspectRatio:false
+            }
 
-});
-const monthLabels = @json($revenueByMonth->pluck('month'));
-const monthData = @json($revenueByMonth->pluck('total'));
-new Chart(document.getElementById('revenueMonthChart'), {
-type:'bar',
-data:{
-labels:monthLabels,
-datasets:[{
-label:'Doanh thu',
-data:monthData,
-backgroundColor:'green'
-}]
-},
-options:{
-responsive:true,
-maintainAspectRatio:false
-}
-});
+            });
+            const monthLabels = @json($revenueByMonth->pluck('month'));
+            const monthData = @json($revenueByMonth->pluck('total'));
+            new Chart(document.getElementById('revenueMonthChart'), {
+            type:'bar',
+            data:{
+            labels:monthLabels,
+            datasets:[{
+            label:'Doanh thu',
+            data:monthData,
+            backgroundColor:'green'
+            }]
+            },
+            options:{
+            responsive:true,
+            maintainAspectRatio:false
+            }
+            });
 
-const productLabels = @json($topProducts->pluck('name'));
-const productData = @json($topProducts->pluck('total'));
+            const productLabels = @json($topProducts->pluck('name'));
+            const productData = @json($topProducts->pluck('total'));
 
-new Chart(document.getElementById('topProductChart'), {
+            new Chart(document.getElementById('topProductChart'), {
 
-type:'pie',
+            type:'pie',
 
-    data:{
-    labels:productLabels,
-    datasets:[{
-    data:productData,
-    backgroundColor:[
-    'red',
-    'blue',
-    'green',
-    'orange',
-    'purple'
-    ]
-    }]
-    },
+                data:{
+                labels:productLabels,
+                datasets:[{
+                data:productData,
+                backgroundColor:[
+                'red',
+                'blue',
+                'green',
+                'orange',
+                'purple'
+                ]
+                }]
+                },
 
-        options:{
-        responsive:true,
-        maintainAspectRatio:false
-        }
+                    options:{
+                    responsive:true,
+                    maintainAspectRatio:false
+                    }
 
-});
+            });
 
 </script>
 <style>

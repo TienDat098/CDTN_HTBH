@@ -58,4 +58,8 @@ class User extends Authenticatable
         $lastTransaction = $this->loyaltyPoints()->orderBy('id', 'desc')->first();
         return $lastTransaction ? $lastTransaction->balance_after : 0;
     }
+    public function blogs()
+    {
+        return $this->hasMany(Blog::class, 'author_id');
+    }
 }

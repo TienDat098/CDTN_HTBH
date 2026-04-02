@@ -38,7 +38,9 @@ Route::get('/dashboard', function () {
 Route::get('/search/suggest', [SearchController::class, 'suggest']);
 // Route cho trang kết quả tìm kiếm chính
 Route::get('/search', [SearchController::class, 'index'])->name('search.index');
-
+// Blog Frontend
+Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blogs.index');
+Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blogs.show');
  // Profile 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -67,6 +69,7 @@ Route::prefix('admin')
         Route::get('/reports/revenue', [\App\Http\Controllers\Admin\DashboardController::class, 'revenueReport'])->name('reports.revenue');
         Route::get('/pos/check-customer', [\App\Http\Controllers\Admin\PosController::class, 'checkCustomer'])->name('pos.checkCustomer');
         Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.update_status');
+        Route::resource('blogs', \App\Http\Controllers\Admin\BlogController::class);
 });
 
 require __DIR__.'/auth.php';

@@ -141,6 +141,42 @@
   </div>
 </nav>
 
+    <div class="bottom-menu bg-white border-bottom shadow-sm d-none d-lg-block">
+    <div class="container">
+        <ul class="nav justify-content-center">
+            <li class="nav-item">
+                <a class="nav-link active text-uppercase fw-bold" href="/">Trang chủ <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase fw-bold" href="#">Hàng hóa <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase fw-bold" href="#">Khuyến mãi <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase fw-bold" href="#">Dịch vụ <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase fw-bold" href="#">Sản phẩm mới <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase fw-bold" href="#">Danh mục giá sỉ <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link text-uppercase fw-bold" href="{{ route('blogs.index') }}">Blog <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase fw-bold" href="#">Liên hệ <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase fw-bold" href="#">Hot deal</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
 <style>
    /* Navbar đỏ */
 .main-navbar{
