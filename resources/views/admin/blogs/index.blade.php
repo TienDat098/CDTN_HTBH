@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-<div class="container mt-4">
+<div class="container-fluid mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Quản lý Bài Viết (Blog)</h2>
         <a href="{{ route('admin.blogs.create') }}" class="btn btn-primary">

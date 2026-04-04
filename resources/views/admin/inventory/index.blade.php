@@ -2,15 +2,47 @@
 @section('title', 'Lịch sử kho')
 
 @section('content')
-<div class="d-flex justify-content-between mb-3">
-    <h3>Lịch sử Nhập / Xuất kho</h3>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<div class="d-flex justify-content-between mb-3 align-items-center">
+    <h3 class="m-0">Lịch sử Nhập / Xuất kho</h3>
     @if(session('success'))
-        <div class="alert alert-success mb-0 px-3 py-2">{{ session('success') }}</div>
+        <div class="alert alert-success m-0 px-3 py-2">{{ session('success') }}</div>
     @endif
 
     <a href="{{ route('admin.inventory.create') }}" class="btn btn-success fw-bold">
          NHẬP HÀNG MỚI
     </a>
+</div>
+
+<div class="card shadow-sm border-0 mb-4 bg-light">
+    <div class="card-body">
+        <form action="{{ route('admin.inventory.index') }}" method="GET" class="row gx-2 gy-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="keyword" class="form-control border-start-0 ps-0" placeholder="Tìm theo tên sản phẩm..." value="{{ request('keyword') }}">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <select name="type" class="form-select">
+                    <option value=""> Tất cả loại (Nhập/Xuất) </option>
+                    <option value="import" {{ request('type') == 'import' ? 'selected' : '' }}> Xem NHẬP KHO</option>
+                    <option value="export" {{ request('type') == 'export' ? 'selected' : '' }}> Xem XUẤT KHO</option>
+                </select>
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1 fw-bold">
+                    <i class="bi bi-funnel-fill me-1"></i> Lọc dữ liệu
+                </button>
+                <a href="{{ route('admin.inventory.index') }}" class="btn btn-outline-secondary px-3" title="Làm mới (Bỏ lọc)">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Làm mới
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <table class="table table-bordered bg-white shadow-sm">
@@ -31,24 +63,26 @@
             <td class="fw-bold">{{ $log->product->name ?? 'Sản phẩm đã bị xóa' }}</td>
             <td>{{ $log->user->name ?? 'Hệ thống' }}</td>
             <td>
-                @if($log->type == 'import')
+                @if($log->type == 'import' || mb_strtoupper($log->type) == 'NHẬP KHO')
                     <span class="badge bg-success">NHẬP KHO</span>
                 @else
                     <span class="badge bg-danger">XUẤT KHO</span>
                 @endif
             </td>
-            <td class="fw-bold {{ $log->type == 'import' ? 'text-success' : 'text-danger' }}">
-                {{ $log->type == 'import' ? '+' : '-' }}{{ $log->quantity }}
+            <td class="fw-bold {{ ($log->type == 'import' || mb_strtoupper($log->type) == 'NHẬP KHO') ? 'text-success' : 'text-danger' }}">
+                {{ ($log->type == 'import' || mb_strtoupper($log->type) == 'NHẬP KHO') ? '+' : '-' }}{{ abs($log->quantity) }}
             </td>
             <td class="text-muted">{{ $log->note }}</td>
         </tr>
         @empty
         <tr>
-            <td colspan="6" class="text-center">Chưa có dữ liệu lịch sử kho</td>
+            <td colspan="6" class="text-center py-4">Chưa có dữ liệu lịch sử kho phù hợp với điều kiện lọc</td>
         </tr>
         @endforelse
     </tbody>
 </table>
 
-{{ $logs->links('pagination::bootstrap-5') }}
+<div class="d-flex justify-content-end mt-3">
+    {{ $logs->appends(request()->all())->links('pagination::bootstrap-5') }}
+</div>
 @endsection

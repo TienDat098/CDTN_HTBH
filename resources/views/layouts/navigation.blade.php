@@ -167,7 +167,7 @@
                 <a class="nav-link text-uppercase fw-bold" href="{{ route('blogs.index') }}">Blog <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold" href="#">Liên hệ <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+                <a class="nav-link text-uppercase fw-bold" href="{{ route('contacts.index') }}">Liên hệ <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-uppercase fw-bold" href="#">Hot deal</a>
@@ -409,6 +409,27 @@ font-size:24px;
     font-size: 13px;
 }
 
+
+/* CSS cho thanh menu dưới */
+.bottom-menu {
+    padding: 0;
+}
+
+.bottom-menu .nav-item {
+    margin: 0 5px;
+}
+
+.bottom-menu .nav-link {
+    color: #333; /* Màu chữ đen xám */
+    font-size: 14px;
+    padding: 12px 10px;
+    transition: color 0.2s ease;
+}
+
+.bottom-menu .nav-link:hover, 
+.bottom-menu .nav-link.active {
+    color: #dc3545 !important; /* Đổi màu đỏ khi hover giống mẫu */
+}
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function () {

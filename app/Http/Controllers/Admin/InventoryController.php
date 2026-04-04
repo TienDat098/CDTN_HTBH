@@ -9,11 +9,31 @@ use App\Models\Product;
 
 class InventoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $logs = InventoryLog::with('product', 'user')
-            ->orderBy('id', 'desc')
-            ->paginate(15);
+        
+        $query = InventoryLog::with(['product', 'user']);
+
+        // Lọc theo từ khóa (Tìm tên sản phẩm)
+        if ($request->filled('keyword')) {
+            $keyword = $request->keyword;
+            $query->whereHas('product', function ($q) use ($keyword) {
+                $q->where('name', 'like', '%' . $keyword . '%');
+            });
+        }
+
+        // Lọc theo loại (Nhập / Xuất)
+        if ($request->filled('type')) {
+            $type = $request->type;
+            if ($type == 'import') {
+                $query->whereIn('type', ['import', 'NHẬP KHO', 'Nhập kho']);
+            } elseif ($type == 'export') {
+                $query->whereIn('type', ['export', 'XUẤT KHO', 'Xuất kho']);
+            }
+        }
+
+        // Sắp xếp mới nhất và phân trang 15 dòng
+        $logs = $query->orderBy('id', 'desc')->paginate(15);
 
         return view('admin.inventory.index', compact('logs'));
     }

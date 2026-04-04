@@ -72,6 +72,13 @@
                           Quản lý Blog
                     </a>    
                 </li>
+                <li class="nav-item mb-2">
+                    <a href="{{ route('admin.contacts.index') }}" 
+                    class="nav-link text-white {{ request()->routeIs('admin.contacts.*') ? 'fw-bold bg-secondary rounded' : '' }}">
+                        Quản lý Liên hệ
+                    </a>
+                 </li>
+
                 <li class="nav-item mt-4">
                     <a href="{{ route('home') }}" class="nav-link text-warning">
                          Về trang chủ

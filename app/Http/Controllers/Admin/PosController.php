@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Order; 
 use App\Models\OrderItem; 
 use App\Models\User;
+use App\Models\InventoryLog;
 use App\Models\LoyaltyPoint;
 use Illuminate\Support\Facades\Hash;
 class PosController extends Controller
@@ -83,18 +84,31 @@ class PosController extends Controller
                 'updated_at' => now()
             ]);
 
-            // Lưu chi tiết sản phẩm và trừ kho
+            // LƯU CHI TIẾT SẢN PHẨM + TRỪ KHO + GHI LOG
             foreach ($cart as $item) {
+                // Lưu vào order_items
                 OrderItem::create([
                     'order_id'   => $order->id,
                     'product_id' => $item['id'],
                     'quantity'   => $item['qty'],
                     'price'      => $item['price']
                 ]);
+
+                // Trừ tồn kho
                 $product = Product::with('stock')->find($item['id']);
                 if ($product && $product->stock) {
                     $product->stock->decrement('quantity', $item['qty']);
                 }
+
+                // Ghi vào bảng Lịch sử Nhập/Xuất kho
+                InventoryLog::create([
+                    'product_id' => $item['id'],
+                    'reference_id' => $order->id,
+                    'quantity' => -$item['qty'], // Số âm thể hiện xuất kho
+                    'type' => 'XUẤT KHO',
+                    'note' => 'Xuất bán POS tại quầy: ' . $order->order_code,
+                    'created_by' => Auth::id() 
+                ]);
             }
 
             // 4. LƯU SỔ CÁI TÍCH ĐIỂM (CỘNG / TRỪ ĐIỂM)

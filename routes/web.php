@@ -41,6 +41,9 @@ Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 // Blog Frontend
 Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blogs.index');
 Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blogs.show');
+// Liên hệ
+Route::get('/lien-he', [\App\Http\Controllers\ContactController::class, 'index'])->name('contacts.index');
+Route::post('/lien-he', [\App\Http\Controllers\ContactController::class, 'store'])->name('contacts.store');
  // Profile 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -70,6 +73,10 @@ Route::prefix('admin')
         Route::get('/pos/check-customer', [\App\Http\Controllers\Admin\PosController::class, 'checkCustomer'])->name('pos.checkCustomer');
         Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.update_status');
         Route::resource('blogs', \App\Http\Controllers\Admin\BlogController::class);
+        Route::get('/contacts', [\App\Http\Controllers\Admin\ContactController::class, 'index'])->name('contacts.index');
+        Route::patch('/contacts/{id}/status', [\App\Http\Controllers\Admin\ContactController::class, 'updateStatus'])->name('contacts.update_status');
+        Route::delete('/contacts/{id}', [\App\Http\Controllers\Admin\ContactController::class, 'destroy'])->name('contacts.destroy');
+        Route::post('/contacts/{id}/reply', [\App\Http\Controllers\Admin\ContactController::class, 'reply'])->name('contacts.reply');
 });
 
 require __DIR__.'/auth.php';
