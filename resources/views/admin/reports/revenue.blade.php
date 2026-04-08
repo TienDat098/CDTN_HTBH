@@ -69,7 +69,15 @@
                             $sumRevenue += $row->total_revenue;
                         @endphp
                         <tr>
-                            <td class="text-start fw-bold">{{ $row->date_group }}</td>
+                            <td class="text-start fw-bold text-dark">
+                                @if($type == 'day')
+                                    {{ \Carbon\Carbon::parse($row->date_group)->format('d/m/Y') }}
+                                @elseif($type == 'month')
+                                    Tháng {{ \Carbon\Carbon::parse($row->date_group . '-01')->format('m/Y') }}
+                                @elseif($type == 'year')
+                                    Năm {{ $row->date_group }}
+                                @endif
+                            </td>
                             <td class="text-center"><span class="badge bg-light text-dark border">{{ $row->total_orders }}</span></td>
                             <td class="text-center fw-bold text-primary">{{ number_format($row->total_revenue) }}đ</td>
                             <td class="text-center text-muted">{{ number_format($row->min_order) }}đ</td>

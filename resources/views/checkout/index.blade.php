@@ -124,9 +124,16 @@
                         @endforeach
                     </div>
 
-                    <div class="d-flex gap-2 mb-4 py-3 border-top border-bottom">
-                        <input type="text" class="form-control form-control-lg" placeholder="Mã giảm giá">
-                        <button type="button" class="btn btn-secondary px-4 disabled">Sử dụng</button>
+                    <div class="py-3 border-top border-bottom mb-4">
+                        <div class="d-flex gap-2">
+                            <input type="text" id="promo_code" class="form-control form-control-lg" placeholder="Mã giảm giá" value="{{ $promotion['code'] ?? '' }}" style="text-transform: uppercase;">
+                            <button type="button" id="btn_apply_promo" class="btn btn-secondary px-4 fw-bold">Sử dụng</button>
+                        </div>
+                        <div id="promo_message" class="mt-2 small">
+                            @if(isset($promotion))
+                                <span class="text-success fw-bold"><i class="bi bi-check-circle"></i> Đã áp dụng mã thành công!</span>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-between mb-2 text-muted">
@@ -134,11 +141,16 @@
                         <span>{{ number_format($total) }}đ</span>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fs-5">Tổng cộng</span>
+                    <div class="d-flex justify-content-between mb-3 text-danger {{ $discountAmount > 0 ? '' : 'd-none' }}" id="discount_row">
+                        <span>Giảm giá khuyến mãi</span>
+                        <span class="fw-bold" id="discount_text">-{{ number_format($discountAmount) }}đ</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                        <span class="fs-5 fw-bold">Tổng cộng</span>
                         <div>
-                            <span class="text-muted small me-2">VND</span>
-                            <span class="fs-3 text-dark">{{ number_format($total) }}đ</span>
+                            <span class="fs-3 text-dark fw-bold" id="final_total_text">{{ number_format($finalTotal) }}đ</span>
+                            <span class="text-muted small ms-1">VND</span>
                         </div>
                     </div>
 
@@ -159,4 +171,60 @@
     .text-primary { color: #338dbc !important; }
     .bg-secondary { background-color: #999999 !important; }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnApply = document.getElementById('btn_apply_promo');
+    
+    btnApply.addEventListener('click', function() {
+        const code = document.getElementById('promo_code').value.trim();
+        const msgBox = document.getElementById('promo_message');
+        const originalText = this.innerHTML;
+
+        if(!code) {
+            msgBox.innerHTML = '<span class="text-danger fw-bold"><i class="bi bi-exclamation-triangle"></i> Vui lòng nhập mã giảm giá.</span>';
+            return;
+        }
+
+        // Hiệu ứng Loading nút bấm
+        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        this.disabled = true;
+
+        fetch('{{ route('checkout.apply_promotion') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ code: code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            this.innerHTML = originalText;
+            this.disabled = false;
+
+            if(data.success) {
+                // Thành công: Đổi chữ xanh, hiện cột giảm giá, cập nhật tổng tiền
+                msgBox.innerHTML = '<span class="text-success fw-bold"><i class="bi bi-check-circle"></i> ' + data.message + '</span>';
+                document.getElementById('discount_row').classList.remove('d-none');
+                document.getElementById('discount_text').innerText = '-' + data.discount_amount_formatted;
+                document.getElementById('final_total_text').innerText = data.final_total_formatted;
+            } else {
+                // Thất bại: Báo lỗi đỏ
+                msgBox.innerHTML = '<span class="text-danger fw-bold"><i class="bi bi-exclamation-circle"></i> ' + data.message + '</span>';
+                
+                // Ẩn dòng giảm giá cũ đi và trả lại tổng tiền chưa giảm
+                document.getElementById('discount_row').classList.add('d-none');
+                if(data.final_total_formatted) {
+                    document.getElementById('final_total_text').innerText = data.final_total_formatted;
+                }
+            }
+        })
+        .catch(error => {
+            this.innerHTML = originalText;
+            this.disabled = false;
+            console.error('Lỗi API:', error);
+        });
+    });
+});
+</script>
 @endsection

@@ -9,14 +9,57 @@ use App\Models\ProductStock;
 use App\Models\InventoryLog;
 use App\Models\Payment;
 use App\Models\OrderStatusHistory;
+
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Lấy danh sách đơn hàng kèm thông tin nhân viên/khách hàng, xếp mới nhất lên đầu
-        $orders = Order::with(['staff', 'user'])->orderBy('id', 'desc')->paginate(10);
+        // Khởi tạo query và tải kèm các bảng liên quan để tối ưu tốc độ load
+        $query = Order::with(['staff', 'user', 'payment']);
+
+        // 1. NGHIỆP VỤ TÌM KIẾM (Mã đơn, Tên/SĐT form đặt hàng, hoặc Tên/SĐT tài khoản User)
+        if ($request->filled('keyword')) {
+            $kw = $request->keyword;
+            $query->where(function ($q) use ($kw) {
+                $q->where('order_code', 'like', "%{$kw}%")
+                  ->orWhere('customer_name', 'like', "%{$kw}%")
+                  ->orWhere('customer_phone', 'like', "%{$kw}%")
+                  ->orWhereHas('user', function ($userQuery) use ($kw) {
+                      $userQuery->where('name', 'like', "%{$kw}%")
+                                ->orWhere('phone', 'like', "%{$kw}%");
+                  });
+            });
+        }
+
+        // 2. NGHIỆP VỤ LỌC THEO TRẠNG THÁI
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // 3. NGHIỆP VỤ SẮP XẾP
+        $sort = $request->input('sort', 'newest'); // Mặc định là mới nhất
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('id', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('final_total', 'desc');
+                break;
+            case 'price_asc':
+                $query->orderBy('final_total', 'asc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('id', 'desc');
+                break;
+        }
+
+        // Phân trang (15 dòng mỗi trang để đồng bộ với Lịch sử kho)
+        $orders = $query->paginate(15);
+        
         return view('admin.orders.index', compact('orders'));
     }
+
     public function show($id)
     {
         $order = Order::with(['items.product', 'items.variant', 'staff', 'user', 'statusHistory' => function($q){
@@ -25,6 +68,7 @@ class OrderController extends Controller
 
         return view('admin.orders.show', compact('order'));
     }
+
     public function updateStatus(Request $request, $id)
     {
         $order = Order::findOrFail($id);

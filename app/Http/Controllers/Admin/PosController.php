@@ -32,7 +32,7 @@ class PosController extends Controller
         try {
             DB::beginTransaction(); 
 
-            // 1. TÌM HOẶC TẠO KHÁCH HÀNG QUA SĐT
+            //  TÌM HOẶC TẠO KHÁCH HÀNG QUA SĐT
             $user = null;
             if (!empty($phone)) {
                 $user = User::firstOrCreate(
@@ -46,7 +46,7 @@ class PosController extends Controller
                 );
             }
 
-            // 2. TÍNH TOÁN TIỀN VÀ KIỂM TRA LUẬT 30%
+            //  TÍNH TOÁN TIỀN VÀ KIỂM TRA LUẬT 30%
             $subTotal = 0;
             foreach ($cart as $item) $subTotal += $item['price'] * $item['qty'];
 
@@ -63,7 +63,7 @@ class PosController extends Controller
                 throw new \Exception("Khách hàng chỉ còn " . $user->points_balance . " điểm!");
             }
 
-            // 3. TẠO ĐƠN HÀNG
+            //  TẠO ĐƠN HÀNG
             $order = Order::create([
                 'order_code'     => 'POS-' . strtoupper(Str::random(6)),
                 'user_id'        => $user ? $user->id : null,
@@ -79,7 +79,7 @@ class PosController extends Controller
                 'order_id' => $order->id,
                 'payment_method' => 'cash', // Đơn POS tại quầy mặc định thu tiền mặt
                 'amount' => $finalTotal,
-                'status' => 'completed', // Đã thu tiền xong
+                'status' => 'completed', 
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -111,7 +111,7 @@ class PosController extends Controller
                 ]);
             }
 
-            // 4. LƯU SỔ CÁI TÍCH ĐIỂM (CỘNG / TRỪ ĐIỂM)
+            //  LƯU SỔ CÁI TÍCH ĐIỂM (CỘNG / TRỪ ĐIỂM)
             if ($user) {
                 $currentBalance = $user->points_balance;
 

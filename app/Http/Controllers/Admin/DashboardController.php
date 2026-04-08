@@ -80,61 +80,59 @@ class DashboardController extends Controller
 
     }
 
-        public function revenueReport(Request $request)
-            {
-            
-            $type = $request->input('type', 'day'); 
-            $fromDate = $request->input('from_date');
-            $toDate = $request->input('to_date');
+       public function revenueReport(Request $request)
+    {
+        $type = $request->input('type', 'day'); 
+        $fromDate = $request->input('from_date');
+        $toDate = $request->input('to_date');
 
-            
-            $query = Order::where('status', 'completed');
+        $query = Order::where('status', 'completed');
 
-            
-            if ($fromDate) {
-                $query->whereDate('created_at', '>=', $fromDate);
-            }
-            if ($toDate) {
-                $query->whereDate('created_at', '<=', $toDate);
-            }
-
-        
-            if ($type == 'month') {
-                $query->select(
-                    DB::raw('DATE_FORMAT(created_at, "%m-%Y") as date_group'),
-                    DB::raw('COUNT(id) as total_orders'),
-                    DB::raw('SUM(total_price) as total_revenue'),
-                    DB::raw('MIN(total_price) as min_order'),
-                    DB::raw('MAX(total_price) as max_order')
-                )->groupBy('date_group')->orderBy(DB::raw('MIN(created_at)'), 'desc');
-                
-            } elseif ($type == 'year') {
-                $query->select(
-                    DB::raw('YEAR(created_at) as date_group'),
-                    DB::raw('COUNT(id) as total_orders'),
-                    DB::raw('SUM(total_price) as total_revenue'),
-                    DB::raw('MIN(total_price) as min_order'),
-                    DB::raw('MAX(total_price) as max_order')
-                )->groupBy('date_group')->orderBy('date_group', 'desc');
-                
-            } else {
-                
-                $query->select(
-                    DB::raw('DATE(created_at) as date_group'),
-                    DB::raw('COUNT(id) as total_orders'),
-                    DB::raw('SUM(total_price) as total_revenue'),
-                    DB::raw('MIN(total_price) as min_order'),
-                    DB::raw('MAX(total_price) as max_order')
-                )->groupBy('date_group')->orderBy('date_group', 'desc');
-            }
-
-            $reports = $query->get();
-
-        
-            return view('admin.reports.revenue', compact('reports', 'type', 'fromDate', 'toDate'));
-        
-        
-
+        // Lọc theo khoảng thời gian
+        if ($fromDate) {
+            $query->whereDate('created_at', '>=', $fromDate);
         }
+        if ($toDate) {
+            $query->whereDate('created_at', '<=', $toDate);
+        }
+
+        // Nhóm dữ liệu tùy theo Loại báo cáo
+        if ($type == 'month') {
+            // Nhóm theo Năm-Tháng (VD: 2026-04) để sort chuẩn xác nhất
+            $query->select(
+                DB::raw('DATE_FORMAT(created_at, "%Y-%m") as date_group'),
+                DB::raw('COUNT(id) as total_orders'),
+                DB::raw('SUM(final_total) as total_revenue'), // Chú ý: Nên dùng final_total thay vì total_price
+                DB::raw('MIN(final_total) as min_order'),
+                DB::raw('MAX(final_total) as max_order')
+            )->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'))
+             ->orderBy('date_group', 'desc');
+             
+        } elseif ($type == 'year') {
+            $query->select(
+                DB::raw('YEAR(created_at) as date_group'),
+                DB::raw('COUNT(id) as total_orders'),
+                DB::raw('SUM(final_total) as total_revenue'),
+                DB::raw('MIN(final_total) as min_order'),
+                DB::raw('MAX(final_total) as max_order')
+            )->groupBy(DB::raw('YEAR(created_at)'))
+             ->orderBy('date_group', 'desc');
+             
+        } else {
+            // Mặc định là nhóm theo Ngày
+            $query->select(
+                DB::raw('DATE(created_at) as date_group'),
+                DB::raw('COUNT(id) as total_orders'),
+                DB::raw('SUM(final_total) as total_revenue'),
+                DB::raw('MIN(final_total) as min_order'),
+                DB::raw('MAX(final_total) as max_order')
+            )->groupBy(DB::raw('DATE(created_at)'))
+             ->orderBy('date_group', 'desc');
+        }
+
+        $reports = $query->get();
+
+        return view('admin.reports.revenue', compact('reports', 'type', 'fromDate', 'toDate'));
+    }
        
 }

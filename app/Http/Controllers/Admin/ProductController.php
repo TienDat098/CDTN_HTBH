@@ -16,13 +16,49 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category','brand','stock'])
-            ->orderBy('id','desc')
-            ->paginate(10);
+        // Tải kèm relations để tối ưu tốc độ load
+        $query = Product::with(['category', 'brand', 'stock']);
 
-        return view('admin.products.index', compact('products'));
+        // 1. TÌM KIẾM (Theo tên hoặc mã Barcode)
+        if ($request->filled('keyword')) {
+            $kw = $request->keyword;
+            $query->where(function ($q) use ($kw) {
+                $q->where('name', 'like', "%{$kw}%")
+                  ->orWhere('barcode', 'like', "%{$kw}%");
+            });
+        }
+
+        // 2. LỌC THEO DANH MỤC
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // 3. SẮP XẾP
+        $sort = $request->input('sort', 'newest'); // Mặc định là mới nhất
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('id', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('sell_price', 'desc');
+                break;
+            case 'price_asc':
+                $query->orderBy('sell_price', 'asc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('id', 'desc');
+                break;
+        }
+
+        $products = $query->paginate(10);
+        
+        // Lấy danh sách danh mục để đổ ra Form lọc
+        $categories = Category::all();
+
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
     /**

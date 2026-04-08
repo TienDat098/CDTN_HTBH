@@ -9,13 +9,13 @@ use App\Models\Product;
 use App\Models\OrderItem;
 use Illuminate\Support\Str;
 use App\Models\InventoryLog;
+use App\Models\Promotion;
 class CheckoutController extends Controller
 {
     
     public function index()
     {
         $cart = session()->get('cart', []);
-        
         
         if (empty($cart)) {
             return redirect()->route('home')->with('error', 'Giỏ hàng của bạn đang trống!');
@@ -27,8 +27,99 @@ class CheckoutController extends Controller
             $total += $item['price'] * $item['quantity'];
         }
 
+        // Kiểm tra xem khách đã áp mã giảm giá trước đó chưa
+        $promotion = session('promotion');
+        
+        // KIỂM TRA BẢO MẬT: Nhỡ khách quay lại giỏ hàng xóa bớt sản phẩm làm tổng tiền bị tụt xuống dưới mức tối thiểu thì sao?
+        if ($promotion) {
+            $promoCheck = Promotion::where('code', $promotion['code'])->first();
+            // Nếu không đủ điều kiện nữa -> Tự động xóa mã khỏi đơn
+            if (!$promoCheck || $total < $promoCheck->min_order_value) {
+                session()->forget('promotion');
+                $promotion = null;
+            } else {
+                // Nếu là mã giảm theo %, phải tính lại số tiền giảm nếu giỏ hàng thay đổi
+                $discountAmount = $promoCheck->discount_type == 'percent' 
+                    ? $total * ($promoCheck->discount_value / 100) 
+                    : $promoCheck->discount_value;
+                    
+                if ($discountAmount > $total) $discountAmount = $total;
+                
+                $promotion['discount_amount'] = $discountAmount;
+                session()->put('promotion', $promotion);
+            }
+        }
+
+        $discountAmount = $promotion ? $promotion['discount_amount'] : 0;
+        $finalTotal = $total - $discountAmount;
+        if($finalTotal < 0) $finalTotal = 0; // Không để tiền âm
        
-        return view('checkout.index', compact('cart', 'total'));
+        return view('checkout.index', compact('cart', 'total', 'discountAmount', 'finalTotal', 'promotion'));
+    }
+
+    // HÀM MỚI: Xử lý Ajax áp dụng mã giảm giá
+    public function applyPromotion(Request $request)
+    {
+        $code = strtoupper($request->code);
+        $cart = session()->get('cart', []);
+        
+        if (empty($cart)) {
+            return response()->json(['success' => false, 'message' => 'Giỏ hàng trống.']);
+        }
+
+        $total = 0;
+        foreach($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+
+        // Xóa mã cũ ngay lập tức mỗi khi khách thử nhập mã mới
+        session()->forget('promotion');
+
+        $promotion = Promotion::where('code', $code)->first();
+
+        if (!$promotion) {
+            return response()->json(['success' => false, 'message' => 'Mã giảm giá không tồn tại!', 'final_total_formatted' => number_format($total) . 'đ']);
+        }
+
+        if ($promotion->status != 1 || now()->lt($promotion->start_date) || now()->gt($promotion->end_date)) {
+            return response()->json(['success' => false, 'message' => 'Mã giảm giá đã hết hạn hoặc chưa kích hoạt.', 'final_total_formatted' => number_format($total) . 'đ']);
+        }
+
+        // Kiểm tra số lượng lượt dùng
+        if ($promotion->used_count >= $promotion->quantity) {
+            return response()->json(['success' => false, 'message' => 'Mã giảm giá đã hết số lượt sử dụng.', 'final_total_formatted' => number_format($total) . 'đ']);
+        }
+
+        // Kiểm tra giá trị đơn hàng tối thiểu
+        if ($total < $promotion->min_order_value) {
+            return response()->json(['success' => false, 'message' => 'Đơn hàng chưa đạt giá trị tối thiểu ' . number_format($promotion->min_order_value) . 'đ', 'final_total_formatted' => number_format($total) . 'đ']);
+        }
+
+        //  Tính toán tiền giảm
+        $discountAmount = 0;
+        if ($promotion->discount_type == 'percent') {
+            $discountAmount = $total * ($promotion->discount_value / 100);
+        } else {
+            $discountAmount = $promotion->discount_value;
+        }
+
+        if ($discountAmount > $total) {
+            $discountAmount = $total;
+        }
+
+        // 6. Lưu vào session
+        session()->put('promotion', [
+            'id' => $promotion->id,
+            'code' => $promotion->code,
+            'discount_amount' => $discountAmount
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Áp dụng mã thành công!',
+            'discount_amount_formatted' => number_format($discountAmount) . 'đ',
+            'final_total_formatted' => number_format($total - $discountAmount) . 'đ'
+        ]);
     }
 
     //lưu dữ liệu vào db
@@ -55,7 +146,10 @@ class CheckoutController extends Controller
         foreach($cart as $item) {
             $total += $item['price'] * $item['quantity'];
         }
-
+        $promotion = session('promotion');
+        $discountAmount = $promotion ? $promotion['discount_amount'] : 0;
+        $finalTotal = $total - $discountAmount;
+        if($finalTotal < 0) $finalTotal = 0;
         DB::beginTransaction();
 
         try {
@@ -66,7 +160,7 @@ class CheckoutController extends Controller
                 'user_id' => auth()->check() ? auth()->id() : null,
                 'customer_name' => $request->customer_name,
                 'customer_phone' => $request->phone,
-                
+                'promotion_id' => $promotion ? $promotion['id'] : null, // Lưu ID khuyến mãi
                 'order_type' => 'online',
                 'shipping_address' => $request->shipping_address, 
                 'note' => $request->note,
@@ -102,6 +196,11 @@ class CheckoutController extends Controller
                     'note' => 'Xuất bán đơn hàng Online: ' . $order->order_code,
                     'created_by' => auth()->id() // Ai đặt hàng thì ghi người đó, khách vãng lai sẽ là null
                 ]);
+            }
+            // NẾU CÓ DÙNG MÃ GIẢM GIÁ -> TĂNG SỐ LƯỢT ĐÃ DÙNG (USED_COUNT) LÊN 1
+            if ($promotion) {
+                Promotion::where('id', $promotion['id'])->increment('used_count');
+                session()->forget('promotion'); // Xóa mã khỏi giỏ hàng
             }
              DB::commit();
                 session()->forget('cart');
