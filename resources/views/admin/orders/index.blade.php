@@ -26,7 +26,9 @@
 
             <div class="col-md-3">
                 <select name="status" class="form-select">
-                    <option value="">-- Tất cả trạng thái --</option>
+                    <option value="">Tất cả trạng thái </option>
+                    <option value="pending_payment" {{ request('status') == 'pending_payment' ? 'selected' : '' }}>Chờ thanh toán</option>
+                    
                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
                     <option value="preparing" {{ request('status') == 'preparing' ? 'selected' : '' }}>Đang chuẩn bị</option>
                     <option value="shipping" {{ request('status') == 'shipping' ? 'selected' : '' }}>Đang giao</option>
@@ -104,12 +106,15 @@
                         </td>
 
                         <td>
-                            @if($order->status == 'pending')
+                            @if($order->status == 'pending_payment')
+                                <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Chờ thanh toán</span>
+                            
+                            @elseif($order->status == 'pending')
                                 <span class="badge bg-secondary">Chờ xử lý</span>
                             @elseif($order->status == 'preparing')
-                                <span class="badge bg-warning text-dark">Đang chuẩn bị</span>
+                                <span class="badge bg-info text-dark">Đang chuẩn bị</span>
                             @elseif($order->status == 'shipping')
-                                <span class="badge bg-info text-dark">Đang giao</span>
+                                <span class="badge bg-primary">Đang giao</span>
                             @elseif($order->status == 'completed')
                                 <span class="badge bg-success">Hoàn thành</span>
                             @elseif($order->status == 'cancelled')

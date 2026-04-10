@@ -20,6 +20,7 @@ class CheckoutController extends Controller
     ];
     public function index()
     {
+        $this->autoCancelExpiredOrders();
         $cart = session()->get('cart', []);
         
         if (empty($cart)) {
@@ -345,6 +346,53 @@ class CheckoutController extends Controller
         }
     }
 
+
+    // =========================================================
+    // 8. HÀM TỰ ĐỘNG HỦY ĐƠN TREO QUÁ 15 PHÚT & HOÀN KHO
+    // =========================================================
+    private function autoCancelExpiredOrders()
+    {
+        // Tìm các đơn PayOS (pending_payment) tạo cách đây hơn 15 phút
+        $expiredOrders = Order::where('status', 'pending_payment')
+            ->where('created_at', '<', now()->subMinutes(15))
+            ->get();
+
+        foreach ($expiredOrders as $order) {
+            DB::beginTransaction();
+            try {
+                // 1. Cập nhật trạng thái đơn và thanh toán
+                $order->update([
+                    'status' => 'cancelled', 
+                    'note' => 'Hệ thống tự động hủy do quá 15 phút chưa thanh toán PayOS.'
+                ]);
+                
+                Payment::where('order_id', $order->id)->update(['status' => 'failed']);
+                
+                // 2. Hoàn lại kho
+                $details = OrderItem::where('order_id', $order->id)->get();
+                foreach($details as $item) {
+                    $product = Product::with('stock')->find($item->product_id);
+                    if($product && $product->stock) {
+                        $product->stock->increment('quantity', $item->quantity);
+                    }
+                    
+                    // Ghi log hệ thống
+                    InventoryLog::create([
+                        'product_id' => $item->product_id,
+                        'reference_id' => $order->id,
+                        'quantity' => $item->quantity,
+                        'type' => 'NHẬP KHO',
+                        'note' => 'Hoàn kho tự động (Hủy đơn PayOS treo): ' . $order->order_code,
+                        'created_by' => auth()->id() ?? 1 // ID 1 thường là Admin hệ thống
+                    ]);
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                continue; // Nếu lỗi ở 1 đơn thì bỏ qua, tiếp tục hủy các đơn khác
+            }
+        }
+    }
     // 3. Trang thông báo thành công
     public function success()
     {

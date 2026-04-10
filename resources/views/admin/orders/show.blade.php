@@ -143,22 +143,23 @@
                                     Đơn hàng đã kết thúc, không thể thay đổi trạng thái.
                                 </div>
                             @else
-                                <select name="status" class="form-select border-primary fw-bold shadow-sm" style="height: 45px;">
-                                    <option value="">Giữ nguyên trạng thái</option>
-                                    
-                                    @if($order->status == 'pending')
-                                        <option value="preparing" class="text-primary"> Chuyển sang: Đang chuẩn bị hàng</option>
-                                        <option value="cancelled" class="text-danger"> HỦY ĐƠN HÀNG (Hoàn lại kho)</option>
-                                    @endif
+                               <select name="status" class="form-select">
+                                    <option value="{{ $order->status }}" selected>Giữ nguyên trạng thái</option>
 
-                                    @if($order->status == 'preparing')
-                                        <option value="shipping" class="text-primary"> Chuyển sang: Đang giao hàng</option>
-                                        <option value="cancelled" class="text-danger"> HỦY ĐƠN HÀNG (Hoàn lại kho)</option>
-                                    @endif
+                                    @if($order->status == 'pending_payment')
+                                        <option value="pending">Xác nhận đã nhận tiền (Chuyển sang Chờ xử lý)</option>
+                                        <option value="cancelled">Hủy đơn hàng</option>
 
-                                    @if($order->status == 'shipping')
-                                        <option value="completed" class="text-success"> Chuyển sang: Khách đã nhận hàng</option>
-                                        <option value="cancelled" class="text-danger"> HỦY ĐƠN HÀNG (Hoàn lại kho)</option>
+                                    @elseif($order->status == 'pending')
+                                        <option value="preparing">Chuyển sang: Đang chuẩn bị hàng</option>
+                                        <option value="cancelled">Hủy đơn hàng</option>
+
+                                    @elseif($order->status == 'preparing')
+                                        <option value="shipping">Chuyển sang: Đang giao hàng</option>
+
+                                    @elseif($order->status == 'shipping')
+                                        <option value="completed">Xác nhận: Giao thành công</option>
+                                        <option value="cancelled">Hủy đơn (Khách bom hàng)</option>
                                     @endif
                                 </select>
                                 

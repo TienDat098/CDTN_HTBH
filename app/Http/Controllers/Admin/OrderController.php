@@ -131,6 +131,7 @@ class OrderController extends Controller
     // Hàm phụ trợ dịch tên trạng thái sang Tiếng Việt để lưu Log
     private function getStatusName($status) {
         $map = [
+            'pending_payment' => 'Chờ thanh toán',
             'pending' => 'Chờ xử lý',
             'preparing' => 'Đang chuẩn bị hàng',
             'shipping' => 'Đang giao hàng',
