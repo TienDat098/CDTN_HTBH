@@ -81,13 +81,24 @@
                     
 
                     <h5 class="fw-bold mb-3">Phương thức thanh toán</h5>
+                    
+                    @if(session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
+
                     <div class="border rounded mb-4">
                         <div class="p-3 border-bottom d-flex align-items-center bg-light">
-                            <input class="form-check-input mt-0 me-3" type="radio" name="payment_method" id="cod" checked>
+                            <input class="form-check-input mt-0 me-3" type="radio" name="payment_method" id="cod" value="cod" checked>
                             <i class="bi bi-cash-stack text-success fs-4 me-2"></i>
-                            <label class="form-check-label" for="cod">Thanh toán khi giao hàng (COD)</label>
+                            <label class="form-check-label" for="cod" style="cursor: pointer;">Thanh toán khi giao hàng (COD)</label>
                         </div>
-                        <div class="p-4 bg-white text-center text-muted small">
+                        
+                        <div class="p-3 d-flex align-items-center bg-light">
+                            <input class="form-check-input mt-0 me-3" type="radio" name="payment_method" id="payos" value="payos">
+                            <i class="bi bi-qr-code-scan text-primary fs-4 me-2"></i>
+                            <label class="form-check-label" for="payos" style="cursor: pointer;">Thanh toán chuyển khoản (Mã VietQR)</label>
+                        </div>
+                        <div class="p-3 bg-white text-center text-muted small border-top" id="payment_desc">
                             Nhận hàng thanh toán tiền mặt trực tiếp với shipper
                         </div>
                     </div>
@@ -173,6 +184,18 @@
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+    const radios = document.querySelectorAll('input[name="payment_method"]');
+    const descBox = document.getElementById('payment_desc');
+    radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if(this.value === 'payos') {
+                descBox.innerHTML = '<span class="text-primary fw-bold">Hệ thống sẽ chuyển sang trang quét mã QR của ngân hàng. Đơn hàng sẽ tự động duyệt ngay sau khi thanh toán thành công!</span>';
+            } else {
+                descBox.innerHTML = 'Nhận hàng thanh toán tiền mặt trực tiếp với shipper.';
+            }
+        });
+    });
     const btnApply = document.getElementById('btn_apply_promo');
     
     btnApply.addEventListener('click', function() {

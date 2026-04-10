@@ -34,7 +34,7 @@ Route::get('/thanh-toan', [CheckoutController::class, 'index'])->name('checkout.
 Route::post('/thanh-toan', [CheckoutController::class, 'process'])->name('checkout.process');
 Route::get('/dat-hang-thanh-cong', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::post('/thanh-toan/ap-dung-ma', [CheckoutController::class, 'applyPromotion'])->name('checkout.apply_promotion');
-
+Route::get('/thanh-toan/payos-return', [CheckoutController::class, 'payosReturn'])->name('checkout.payos_return');
 // Dashboard 
 Route::get('/dashboard', function () {
     return view('dashboard');
