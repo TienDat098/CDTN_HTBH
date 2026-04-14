@@ -197,17 +197,20 @@ class CheckoutController extends Controller
 
                 // Trừ kho thực tế
                 $product = Product::with('stock')->find($item['product_id']);
+                $balanceAfter = 0;
                 if ($product && $product->stock) {
                     $product->stock->decrement('quantity', $item['quantity']);
+                    $balanceAfter = $product->stock->fresh()->quantity;
                 }
 
                 InventoryLog::create([
                     'product_id' => $item['product_id'],
                     'reference_id' => $order->id,
                     'quantity' => -$item['quantity'],
+                    'balance_after' => $balanceAfter,
                     'type' => 'XUẤT KHO',
                     'note' => 'Xuất bán Online: ' . $order->order_code,
-                    'created_by' => auth()->id()
+                    'created_by' => auth()->id() ?? 1
                 ]);
             }
 
@@ -327,17 +330,22 @@ class CheckoutController extends Controller
             $details = OrderItem::where('order_id', $order->id)->get();
             foreach($details as $item) {
                 $product = Product::with('stock')->find($item->product_id);
+                $balanceAfter = 0;
                 if($product && $product->stock) {
+                    // Hoàn lại kho bằng cách cộng số lượng đã trừ khi tạo đơn
                     $product->stock->increment('quantity', $item->quantity);
+                    // Lấy số lượng sau khi hoàn kho để ghi vào log
+                    $balanceAfter = $product->stock->fresh()->quantity;
                 }
                 
                 InventoryLog::create([
                     'product_id' => $item->product_id,
                     'reference_id' => $order->id,
                     'quantity' => $item->quantity,
+                    'balance_after' => $balanceAfter,
                     'type' => 'NHẬP KHO',
                     'note' => 'Hoàn kho do hủy thanh toán PayOS: ' . $orderCode,
-                    'created_by' => auth()->id()
+                    'created_by' => 1
                 ]);
             }
             
@@ -372,8 +380,11 @@ class CheckoutController extends Controller
                 $details = OrderItem::where('order_id', $order->id)->get();
                 foreach($details as $item) {
                     $product = Product::with('stock')->find($item->product_id);
+                    $balanceAfter = 0;
                     if($product && $product->stock) {
                         $product->stock->increment('quantity', $item->quantity);
+                        $balanceAfter = $product->stock->fresh()->quantity;
+                        
                     }
                     
                     // Ghi log hệ thống
@@ -381,6 +392,7 @@ class CheckoutController extends Controller
                         'product_id' => $item->product_id,
                         'reference_id' => $order->id,
                         'quantity' => $item->quantity,
+                        'balance_after' => $balanceAfter,
                         'type' => 'NHẬP KHO',
                         'note' => 'Hoàn kho tự động (Hủy đơn PayOS treo): ' . $order->order_code,
                         'created_by' => auth()->id() ?? 1 // ID 1 thường là Admin hệ thống

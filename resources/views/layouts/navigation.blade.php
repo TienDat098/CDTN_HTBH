@@ -119,24 +119,18 @@
 
     <!-- Cart -->
     <div class="nav-icon">
+            <a href="{{ route('cart.index') }}" class="icon-box cart-box ms-4"> <div class="cart-icon me-2">
+                    <i class="bi bi-cart fs-3"></i> <span class="cart-count">
+                        {{ session('cart') ? array_sum(array_column(session('cart'), 'quantity')) : 0 }}
+                    </span>
+                </div>
 
-        <a href="{{ route('cart.index') }}" class="icon-box cart-box">
-
-            <div class="cart-icon">
-                <i class="bi bi-cart"></i>
-               <span class="cart-count">
-                    {{ session('cart') ? array_sum(array_column(session('cart'), 'quantity')) : 0 }}
-                </span>
-            </div>
-
-            <div>
-                <small>Giỏ hàng</small><br>
-                <span>của bạn</span>
-            </div>
-
-        </a>
-
-    </div>
+                <div>
+                    <small>Giỏ hàng</small><br>
+                    <span>của bạn</span>
+                </div>
+            </a>
+        </div>
 
   </div>
 </nav>
@@ -145,32 +139,19 @@
     <div class="container">
         <ul class="nav justify-content-center">
             <li class="nav-item">
-                <a class="nav-link active text-uppercase fw-bold" href="/">Trang chủ <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+                <a class="nav-link active text-uppercase fw-bold" href="/">Trang chủ</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold" href="#">Hàng hóa <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+                <a class="nav-link text-uppercase fw-bold" href="#">Khuyến mãi</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold" href="#">Khuyến mãi <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+                <a class="nav-link text-uppercase fw-bold" href="{{ route('product.index') }}">Sản phẩm</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold" href="#">Dịch vụ <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
+                <a class="nav-link text-uppercase fw-bold" href="{{ route('blogs.index') }}">Blog</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold" href="#">Sản phẩm mới <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold" href="#">Danh mục giá sỉ <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
-            </li>
-            
-            <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold" href="{{ route('blogs.index') }}">Blog <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold" href="{{ route('contacts.index') }}">Liên hệ <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold" href="#">Hot deal</a>
+                <a class="nav-link text-uppercase fw-bold" href="{{ route('contacts.index') }}">Liên hệ</a>
             </li>
         </ul>
     </div>
@@ -230,7 +211,7 @@
     display: flex;
     background: white;
     border-radius: 6px;
-    overflow: hidden; /* Bo góc mượt mà */
+    overflow: hidden; 
     border: 1px solid #dbeafe;
     width: 100%;
 }
@@ -268,17 +249,20 @@
 /* Cart */
 .cart-icon{
     position:relative;
+    display: inline-block;
 }
 
 .cart-count{
     position:absolute;
-    top:-6px;
-    right:-10px;
+    top:-5px;
+    right:-12px;
     background:#3b82f6;
     color:white;
-    font-size:12px;
+    font-size:11px;
+    font-weight: bold;
     border-radius:50%;
     padding:2px 6px;
+    min-width: 18px;
 }
 
 
@@ -416,13 +400,13 @@ font-size:24px;
 }
 
 .bottom-menu .nav-item {
-    margin: 0 5px;
+    margin: 0 20px;
 }
 
 .bottom-menu .nav-link {
     color: #333; /* Màu chữ đen xám */
-    font-size: 14px;
-    padding: 12px 10px;
+    font-size: 15px;
+    padding: 12px 15px;
     transition: color 0.2s ease;
 }
 

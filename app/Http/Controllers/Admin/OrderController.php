@@ -17,7 +17,7 @@ class OrderController extends Controller
         // Khởi tạo query và tải kèm các bảng liên quan để tối ưu tốc độ load
         $query = Order::with(['staff', 'user', 'payment']);
 
-        // 1. NGHIỆP VỤ TÌM KIẾM (Mã đơn, Tên/SĐT form đặt hàng, hoặc Tên/SĐT tài khoản User)
+        //  NGHIỆP VỤ TÌM KIẾM 
         if ($request->filled('keyword')) {
             $kw = $request->keyword;
             $query->where(function ($q) use ($kw) {
@@ -31,13 +31,13 @@ class OrderController extends Controller
             });
         }
 
-        // 2. NGHIỆP VỤ LỌC THEO TRẠNG THÁI
+        //  NGHIỆP VỤ LỌC THEO TRẠNG THÁI
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // 3. NGHIỆP VỤ SẮP XẾP
-        $sort = $request->input('sort', 'newest'); // Mặc định là mới nhất
+        //  NGHIỆP VỤ SẮP XẾP
+        $sort = $request->input('sort', 'newest'); 
         switch ($sort) {
             case 'oldest':
                 $query->orderBy('id', 'asc');
@@ -54,7 +54,7 @@ class OrderController extends Controller
                 break;
         }
 
-        // Phân trang (15 dòng mỗi trang để đồng bộ với Lịch sử kho)
+        // Phân trang 
         $orders = $query->paginate(15);
         
         return view('admin.orders.index', compact('orders'));
@@ -79,16 +79,16 @@ class OrderController extends Controller
             return redirect()->back();
         }
 
-        // 1. NGHIỆP VỤ HỦY ĐƠN VÀ HOÀN KHO
+        //  NGHIỆP VỤ HỦY ĐƠN VÀ HOÀN KHO
         if ($newStatus == 'cancelled') {
             // Sử dụng $order->items theo đúng relation của bạn
             foreach ($order->items as $item) {
                 // Cộng lại số lượng vào kho
                 ProductStock::where('product_id', $item->product_id)
-                    ->where('variant_id', $item->variant_id) // Nếu không dùng biến thể, có thể bỏ dòng này
+                    ->where('variant_id', $item->variant_id) 
                     ->increment('quantity', $item->quantity);
 
-                // Ghi Log hoàn kho
+                
                 InventoryLog::create([
                     'product_id' => $item->product_id,
                     'variant_id' => $item->variant_id,
@@ -101,13 +101,13 @@ class OrderController extends Controller
             }
         }
 
-        // 2. NGHIỆP VỤ GIAO THÀNH CÔNG -> TỰ ĐỘNG ĐÃ THANH TOÁN
+        //  NGHIỆP VỤ GIAO THÀNH CÔNG -> TỰ ĐỘNG ĐÃ THANH TOÁN
         if ($newStatus == 'completed') {
             Payment::updateOrCreate(
                 ['order_id' => $order->id],
                 [
                     'payment_method' => 'cod',
-                    'amount' => $order->final_total, // Đảm bảo bảng orders của bạn có cột final_total
+                    'amount' => $order->final_total, 
                     'status' => 'completed',
                     'transaction_code' => 'COD_' . time()
                 ]

@@ -12,7 +12,7 @@ class InventoryController extends Controller
     public function index(Request $request)
     {
         
-        $query = InventoryLog::with(['product', 'user']);
+        $query = InventoryLog::with(['product.stock', 'user']);
 
         // Lọc theo từ khóa (Tìm tên sản phẩm)
         if ($request->filled('keyword')) {
@@ -56,7 +56,7 @@ class InventoryController extends Controller
             //lấy số lượng hiện tại của sản phẩm
             $currentQuantity = $product->stock->quantity ?? 0;
             //cộng số lượng mới vào số kho
-            $product->stock()->updateOrCreate(
+           $stock = $product->stock()->updateOrCreate(
             ['product_id' => $product->id],
             ['quantity' => $currentQuantity + $request->quantity]
         );
@@ -65,6 +65,7 @@ class InventoryController extends Controller
         InventoryLog::create([
             'product_id' => $product->id,
             'quantity' => $request->quantity,
+            'balance_after' => $stock->quantity,
             'type' => 'import',
             'note' => $request->note ?? 'Nhập thêm hàng hóa vào kho', // Nếu có ghi chú thì lấy, không thì dùng câu mặc định
             'created_by' => auth()->id() ?? 1

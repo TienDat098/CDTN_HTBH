@@ -104,17 +104,14 @@
                             <span class="text-muted">Tạm tính:</span>
                             <span class="fw-bold fs-5 text-dark">{{ number_format($total) }}đ</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
-                            <span class="text-muted">Phí giao hàng:</span>
-                            <span class="fw-bold text-success Miễn phí">Miễn phí</span>
-                        </div>
+                        
                         
                         <div class="d-flex justify-content-between mb-4 mt-2">
                             <span class="fw-bold fs-4 text-dark">TỔNG CỘNG:</span>
                             <span class="fw-bold fs-3 text-danger">{{ number_format($total) }}đ</span>
                         </div>
 
-                        <a href="{{ route('checkout.index') }}" class="btn btn-warning w-100 fw-bold py-3 fs-5 shadow-sm text-dark btn-thanh-toan">
+                        <a href="{{ route('checkout.index') }}" class="btn btn-success w-100 fw-bold py-3 fs-5 shadow-sm text-dark btn-thanh-toan">
                             TIẾN HÀNH THANH TOÁN
                         </a>
                     </div>
@@ -135,7 +132,7 @@
 </div>
 
 <style>
-    /* Style mới cho giỏ hàng xịn */
+    
     .table th { font-weight: 600; text-transform: uppercase; font-size: 13px; color: #6c757d; }
     .table-hover tbody tr:hover { background-color: #fef8f8; }
     .hover-text-danger:hover { color: #dc3545 !important; }
@@ -147,10 +144,10 @@
     
     .card { border-radius: 12px; }
     
-    /* Làm con số số lượng to và rõ hơn */
+    
     input[type=number]::-webkit-inner-spin-button, 
     input[type=number]::-webkit-outer-spin-button { 
-      opacity: 1; /* Luôn hiện nút tăng giảm */
+      opacity: 1; 
     }
 </style>
 @endsection

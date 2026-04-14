@@ -6,9 +6,6 @@
 
 <div class="d-flex justify-content-between mb-3 align-items-center">
     <h3 class="m-0">Lịch sử Nhập / Xuất kho</h3>
-    @if(session('success'))
-        <div class="alert alert-success m-0 px-3 py-2">{{ session('success') }}</div>
-    @endif
 
     <a href="{{ route('admin.inventory.create') }}" class="btn btn-success fw-bold">
          NHẬP HÀNG MỚI
@@ -45,14 +42,15 @@
     </div>
 </div>
 
-<table class="table table-bordered bg-white shadow-sm">
-    <thead class="table-dark">
+<table class="table table-bordered bg-white shadow-sm align-middle">
+    <thead class="table-light">
         <tr>
             <th>Thời gian</th>
             <th>Sản phẩm</th>
             <th>Người thực hiện</th>
             <th>Loại</th>
-            <th>Số lượng</th>
+            <th class="text-center">Biến động</th>
+            <th class="text-center">Tồn kho hiện hành</th>
             <th>Ghi chú</th>
         </tr>
     </thead>
@@ -62,6 +60,7 @@
             <td>{{ $log->created_at->format('d/m/Y H:i') }}</td>
             <td class="fw-bold">{{ $log->product->name ?? 'Sản phẩm đã bị xóa' }}</td>
             <td>{{ $log->user->name ?? 'Hệ thống' }}</td>
+            
             <td>
                 @if($log->type == 'import' || mb_strtoupper($log->type) == 'NHẬP KHO')
                     <span class="badge bg-success">NHẬP KHO</span>
@@ -69,14 +68,22 @@
                     <span class="badge bg-danger">XUẤT KHO</span>
                 @endif
             </td>
-            <td class="fw-bold {{ ($log->type == 'import' || mb_strtoupper($log->type) == 'NHẬP KHO') ? 'text-success' : 'text-danger' }}">
+            
+            <td class="text-center fw-bold fs-5 {{ ($log->type == 'import' || mb_strtoupper($log->type) == 'NHẬP KHO') ? 'text-success' : 'text-danger' }}">
                 {{ ($log->type == 'import' || mb_strtoupper($log->type) == 'NHẬP KHO') ? '+' : '-' }}{{ abs($log->quantity) }}
             </td>
-            <td class="text-muted">{{ $log->note }}</td>
+
+            <td class="text-center">
+                <span class="fw-bold fs-5 text-dark">
+                    {{ $log->balance_after }}
+                </span>
+            </td>
+
+            <td class="text-muted small">{{ $log->note }}</td>
         </tr>
         @empty
         <tr>
-            <td colspan="6" class="text-center py-4">Chưa có dữ liệu lịch sử kho phù hợp với điều kiện lọc</td>
+            <td colspan="7" class="text-center py-4">Chưa có dữ liệu lịch sử kho phù hợp với điều kiện lọc</td>
         </tr>
         @endforelse
     </tbody>

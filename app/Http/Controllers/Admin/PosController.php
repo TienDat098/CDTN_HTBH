@@ -96,15 +96,18 @@ class PosController extends Controller
 
                 // Trừ tồn kho
                 $product = Product::with('stock')->find($item['id']);
+                $balanceAfter = 0;
                 if ($product && $product->stock) {
                     $product->stock->decrement('quantity', $item['qty']);
+                    $balanceAfter = $product->stock->fresh()->quantity;
                 }
 
                 // Ghi vào bảng Lịch sử Nhập/Xuất kho
                 InventoryLog::create([
                     'product_id' => $item['id'],
                     'reference_id' => $order->id,
-                    'quantity' => -$item['qty'], // Số âm thể hiện xuất kho
+                    'quantity' => -$item['qty'],// Số âm thể hiện xuất kho
+                    'balance_after' => $balanceAfter, 
                     'type' => 'XUẤT KHO',
                     'note' => 'Xuất bán POS tại quầy: ' . $order->order_code,
                     'created_by' => Auth::id() 

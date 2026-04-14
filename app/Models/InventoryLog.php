@@ -8,7 +8,7 @@ class InventoryLog extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'reference_id', 'quantity', 'type', 'note', 'created_by'];
+    protected $fillable = ['product_id', 'reference_id', 'quantity','balance_after', 'type', 'note', 'created_by'];
 
     public function product()
     {

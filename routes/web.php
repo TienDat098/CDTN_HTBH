@@ -28,7 +28,7 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 
 // Route xem chi tiết sản phẩm (Client)
 Route::get('/san-pham/{slug}', [ClientProductController::class, 'show'])->name('product.show');
-
+Route::get('/danh-sach-san-pham', [ClientProductController::class, 'index'])->name('product.index');
 // Thanh toán (ĐÃ GỘP CHUNG VÀO ĐÂY VÀ THÊM ROUTE AJAX)
 Route::get('/thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/thanh-toan', [CheckoutController::class, 'process'])->name('checkout.process');
@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
 // Admin
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware('auth')
+    ->middleware(['auth', 'role:admin,staff'])
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
