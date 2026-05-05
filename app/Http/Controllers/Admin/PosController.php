@@ -39,9 +39,9 @@ class PosController extends Controller
                     ['phone' => $phone],
                     [
                         'name' => 'Khách hàng ' . $phone,
-                        'email' => $phone . '@khachhang.com', // Cột email thường bắt buộc nên fake tạm
+                        'email' => $phone . '@khachhang.com', 
                         'password' => Hash::make(Str::random(10)),
-                        'role' => 'user'
+                        'role' => 'customer'
                     ]
                 );
             }
@@ -53,12 +53,12 @@ class PosController extends Controller
             $discountAmount = $usedPoints * 100; 
             $finalTotal = $subTotal - $discountAmount;
 
-            // Chặn hack từ frontend: Quá 30% là báo lỗi
+            
             if ($discountAmount > ($subTotal * 0.3)) {
                 throw new \Exception("Lỗi: Không được giảm giá vượt quá 30% giá trị đơn!");
             }
 
-            // Chặn hack: Khách không đủ điểm
+            
             if ($user && $usedPoints > 0 && $user->points_balance < $usedPoints) {
                 throw new \Exception("Khách hàng chỉ còn " . $user->points_balance . " điểm!");
             }
@@ -86,7 +86,7 @@ class PosController extends Controller
 
             // LƯU CHI TIẾT SẢN PHẨM + TRỪ KHO + GHI LOG
             foreach ($cart as $item) {
-                // Lưu vào order_items
+                
                 OrderItem::create([
                     'order_id'   => $order->id,
                     'product_id' => $item['id'],
@@ -106,7 +106,7 @@ class PosController extends Controller
                 InventoryLog::create([
                     'product_id' => $item['id'],
                     'reference_id' => $order->id,
-                    'quantity' => -$item['qty'],// Số âm thể hiện xuất kho
+                    'quantity' => -$item['qty'],
                     'balance_after' => $balanceAfter, 
                     'type' => 'XUẤT KHO',
                     'note' => 'Xuất bán POS tại quầy: ' . $order->order_code,
@@ -114,9 +114,10 @@ class PosController extends Controller
                 ]);
             }
 
-            //  LƯU SỔ CÁI TÍCH ĐIỂM (CỘNG / TRỪ ĐIỂM)
+            
             if ($user) {
-                $currentBalance = $user->points_balance;
+                $currentBalance = $user->points_balance ?? 0 ;
+                
 
                 // TRỪ ĐIỂM (Nếu có dùng)
                 if ($usedPoints > 0) {
@@ -126,7 +127,7 @@ class PosController extends Controller
                         'order_id' => $order->id,
                         'type' => 'redeem',
                         'points' => -$usedPoints, // Điểm âm
-                        'balance_after' => $currentBalance,
+                        'balance_after' => $currezntBalance,
                         'reason' => 'Tiêu điểm cho đơn hàng ' . $order->order_code,
                     ]);
                 }
@@ -144,8 +145,10 @@ class PosController extends Controller
                         'reason' => 'Tích điểm từ đơn hàng ' . $order->order_code,
                     ]);
                 }
+                $user->points_balance = $currentBalance;
+                $user->save();
             }
-
+            
             DB::commit(); 
             return response()->json(['success' => true, 'message' => 'Thanh toán thành công!']);
 

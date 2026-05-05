@@ -142,9 +142,6 @@
                 <a class="nav-link active text-uppercase fw-bold" href="/">Trang chủ</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-uppercase fw-bold" href="#">Khuyến mãi</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link text-uppercase fw-bold" href="{{ route('product.index') }}">Sản phẩm</a>
             </li>
             <li class="nav-item">

@@ -154,7 +154,7 @@
                     <i class="bi bi-exclamation-octagon" style="font-size: 2rem; opacity: 0.5;"></i>
                 </div>
                 <div class="mt-4 pt-2">
-                    <a href="#" class="text-white text-decoration-none" style="font-size: 14px;">
+                    <a href="#low-stock-table" class="text-white text-decoration-none" style="font-size: 14px;">
                         Xem cảnh báo <i class="bi bi-chevron-right ms-1" style="font-size: 11px;"></i>
                     </a>
                 </div>
@@ -234,7 +234,7 @@
 
     <hr class="mt-5">
 
-            <h4>Sản phẩm sắp hết hàng (tồn < 10)</h4>
+            <h4 id="low-stock-table">Sản phẩm sắp hết hàng (tồn < 10)</h4>
 
             <table class="table table-bordered">
 
@@ -343,6 +343,13 @@
     }
     .custom-card-footer:hover {
         background-color: rgba(0,0,0,0.25) !important;
+    }
+    html {
+        scroll-behavior: smooth;
+    }
+
+    .custom-card-footer {
+        transition: background-color 0.2s ease-in-out;
     }
 </style>
 @endsection

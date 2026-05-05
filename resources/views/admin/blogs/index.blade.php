@@ -86,7 +86,7 @@
 </div>
 
 <style>
-    /* Ép kích thước nút vuông vức và icon nằm chính giữa giống hệt ảnh mẫu */
+   
     .btn-action {
         width: 32px;
         height: 32px;
@@ -97,7 +97,7 @@
         border-radius: 4px;
     }
     
-    /* Chỉnh chữ trong badge to và rõ hơn 1 chút */
+    
     .status-badge {
         font-size: 13px;
         font-weight: 500;

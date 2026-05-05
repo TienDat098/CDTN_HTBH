@@ -1,7 +1,7 @@
 @extends('admin.layouts.app') 
 
 @section('content')
-<div class="container mt-4">
+<div class="container-fluid px-4 mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Thêm Bài Viết Mới</h2>
         <a href="{{ route('admin.blogs.index') }}" class="btn btn-secondary">

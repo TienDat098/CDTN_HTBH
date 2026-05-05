@@ -51,26 +51,36 @@
                     </a>
                     <div class="collapse {{ $isProductActive ? 'show' : '' }}" id="menuProduct">
                         <ul class="nav flex-column submenu">
+                            
+                            @if(Auth::user()->role === 'admin')
                             <li class="nav-item">
                                 <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                                     <i class="bi bi-chevron-right me-1 small"></i> Danh mục
                                 </a>
                             </li>
+                            @endif
+
+                            @if(Auth::user()->role === 'admin')
                             <li class="nav-item">
                                 <a href="{{ route('admin.brands.index') }}" class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}">
                                     <i class="bi bi-chevron-right me-1 small"></i> Thương hiệu
                                 </a>
                             </li>
+                            @endif
+
                             <li class="nav-item">
                                 <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                                     <i class="bi bi-chevron-right me-1 small"></i> Tất cả sản phẩm
                                 </a>
                             </li>
+                            
+                            @if(Auth::user()->role === 'admin')
                             <li class="nav-item">
                                 <a href="{{ route('admin.inventory.index') }}" class="nav-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}">
                                     <i class="bi bi-chevron-right me-1 small"></i> Lịch sử Kho
                                 </a>
                             </li>
+                            @endif
                         </ul>
                     </div>
                 </li>
@@ -121,11 +131,13 @@
                     </div>
                 </li>
 
+                @if(Auth::user()->role === 'admin')
                 <li class="nav-item mb-1 mt-2">
                     <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                         <i class="bi bi-people-fill me-2 text-secondary"></i> Quản lý Tài khoản
                     </a>
                 </li>
+                @endif
 
             </ul>
 

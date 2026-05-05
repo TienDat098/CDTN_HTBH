@@ -18,7 +18,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // Tải kèm relations để tối ưu tốc độ load
+        
         $query = Product::with(['category', 'brand', 'stock']);
 
         // 1. TÌM KIẾM (Theo tên hoặc mã Barcode)
@@ -198,6 +198,7 @@ class ProductController extends Controller
             InventoryLog::create([
                 'product_id' => $product->id,
                 'quantity' => $diff,
+                'balance_after' => $newQuantity,
                 'type' => 'import',
                 'note' => 'Cập nhật tăng tồn kho gốc',
                 'created_by' => auth()->id() ?? 1
@@ -205,7 +206,8 @@ class ProductController extends Controller
         } elseif ($diff < 0) {
             InventoryLog::create([
                 'product_id' => $product->id,
-                'quantity' => abs($diff), // abs() để lấy số dương cho quantity
+                'quantity' =>$diff, // để lấy số dương cho quantity
+                'balance_after' => $newQuantity,
                 'type' => 'export',
                 'note' => 'Cập nhật giảm tồn kho gốc',
                 'created_by' => auth()->id() ?? 1
@@ -283,11 +285,31 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(Product $product)
     {
-        $product->delete();
+        try {
+            //  Dọn dẹp sạch sẽ các dữ liệu "con" ăn theo sản phẩm này
+            \App\Models\InventoryLog::where('product_id', $product->id)->delete();
+            \App\Models\ProductStock::where('product_id', $product->id)->delete();
+            $product->variants()->delete();
+            $product->images()->delete();
 
-        return redirect()->route('admin.products.index')
-            ->with('success','Đã xóa sản phẩm');
+            // Xóa sản phẩm "cha"
+            $product->delete();
+
+            return redirect()->route('admin.products.index')
+                ->with('success', 'Đã xóa sản phẩm thành công!');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Bắt lỗi nếu sản phẩm ĐÃ NẰM TRONG ĐƠN HÀNG của khách (không được phép xóa)
+            if ($e->getCode() == 23000) {
+                return redirect()->back()->with('error', 'Không thể xóa! Sản phẩm này đã phát sinh giao dịch hoặc nằm trong hóa đơn của khách. Vui lòng bấm Sửa và chuyển Trạng thái thành "Ẩn" thay vì xóa.');
+            }
+            
+            return redirect()->back()->with('error', 'Lỗi hệ thống: ' . $e->getMessage());
+        }
     }
 }

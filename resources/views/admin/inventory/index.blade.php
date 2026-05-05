@@ -47,7 +47,7 @@
         <tr>
             <th>Thời gian</th>
             <th>Sản phẩm</th>
-            <th>Người thực hiện</th>
+            <th>Người tác động</th>
             <th>Loại</th>
             <th class="text-center">Biến động</th>
             <th class="text-center">Tồn kho hiện hành</th>
@@ -58,7 +58,26 @@
         @forelse($logs as $log)
         <tr>
             <td>{{ $log->created_at->format('d/m/Y H:i') }}</td>
-            <td class="fw-bold">{{ $log->product->name ?? 'Sản phẩm đã bị xóa' }}</td>
+            <td>
+                <div class="fw-bold fs-6 text-primary">{{ $log->product->name ?? 'Sản phẩm đã bị xóa' }}</div>
+                @if(Str::contains($log->note, 'Nhập phân loại ['))
+                    @php
+                        // Hàm này sẽ cắt lấy đoạn chữ nằm giữa dấu [ và ]
+                        $variantName = Str::before(Str::after($log->note, 'Nhập phân loại ['), ']');
+                    @endphp
+                    <div class="mt-1">
+                        <span class="badge bg-warning text-dark border border-warning shadow-sm">
+                            Phân loại: {{ $variantName }}
+                        </span>
+                    </div>
+                @else
+                    <div class="mt-1">
+                        <span class="badge bg-light text-secondary border">
+                             Sản phẩm gốc
+                        </span>
+                    </div>
+                @endif
+            </td>
             <td>{{ $log->user->name ?? 'Hệ thống' }}</td>
             
             <td>

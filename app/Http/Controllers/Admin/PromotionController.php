@@ -82,7 +82,6 @@ class PromotionController extends Controller
             'min_order_value' => $request->min_order_value ?? 0,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
-            // Nếu checkbox được bật (has 'status'), lưu là 1, ngược lại là 0
             'status' => $request->has('status') ? 1 : 0 
         ]);
 

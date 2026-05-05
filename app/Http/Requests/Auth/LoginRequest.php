@@ -48,7 +48,14 @@ class LoginRequest extends FormRequest
                 'email' => trans('auth.failed'),
             ]);
         }
-
+        if (Auth::user()->status == 0) {
+            Auth::logout(); // Đăng xuất ngay lập tức
+            
+            // Ném ra thông báo lỗi đỏ chót ở khung đăng nhập
+            throw ValidationException::withMessages([
+                'email' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin!',
+            ]);
+        }
         RateLimiter::clear($this->throttleKey());
     }
 

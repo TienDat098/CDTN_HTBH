@@ -68,24 +68,35 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin,staff'])
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
-        Route::resource('brands', \App\Http\Controllers\Admin\BrandController::class);
+        // Quản lý sản phẩm
         Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
-        Route::resource('inventory', \App\Http\Controllers\Admin\InventoryController::class)
-            ->only(['index', 'create', 'store']);
-        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show', 'create', 'store']);
-        Route::get('/pos', [\App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');
-        Route::post('/pos/checkout', [\App\Http\Controllers\Admin\PosController::class, 'checkout'])->name('pos.checkout');
+        // Quản lý đơn hàng
         Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show', 'update']);
-        Route::get('/reports/revenue', [\App\Http\Controllers\Admin\DashboardController::class, 'revenueReport'])->name('reports.revenue');
-        Route::get('/pos/check-customer', [\App\Http\Controllers\Admin\PosController::class, 'checkCustomer'])->name('pos.checkCustomer');
+        // Cập nhật trạng thái đơn hàng
         Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.update_status');
+        // Quản lý khuyến mãi
+        Route::resource('promotions', \App\Http\Controllers\Admin\PromotionController::class);
+        // Quản lý bài viết
         Route::resource('blogs', \App\Http\Controllers\Admin\BlogController::class);
+        // Quản lý liên hệ
         Route::get('/contacts', [\App\Http\Controllers\Admin\ContactController::class, 'index'])->name('contacts.index');
         Route::patch('/contacts/{id}/status', [\App\Http\Controllers\Admin\ContactController::class, 'updateStatus'])->name('contacts.update_status');
         Route::delete('/contacts/{id}', [\App\Http\Controllers\Admin\ContactController::class, 'destroy'])->name('contacts.destroy');
         Route::post('/contacts/{id}/reply', [\App\Http\Controllers\Admin\ContactController::class, 'reply'])->name('contacts.reply');
-        Route::resource('promotions', \App\Http\Controllers\Admin\PromotionController::class);
+        //Pos bán hàng
+        Route::get('/pos', [\App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');
+        Route::post('/pos/checkout', [\App\Http\Controllers\Admin\PosController::class, 'checkout'])->name('pos.checkout');
+        Route::get('/pos/check-customer', [\App\Http\Controllers\Admin\PosController::class, 'checkCustomer'])->name('pos.checkCustomer');
 });
-
+//  CHỈ CÓ ADMIN
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth', 'role:admin']) 
+    ->group(function () {
+        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class); // Danh mục
+        Route::resource('brands', \App\Http\Controllers\Admin\BrandController::class); // Thương hiệu
+        Route::resource('inventory', \App\Http\Controllers\Admin\InventoryController::class)->only(['index', 'create', 'store']); // Tồn kho
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show', 'create', 'store']); // Tài khoản
+        Route::get('/reports/revenue', [\App\Http\Controllers\Admin\DashboardController::class, 'revenueReport'])->name('reports.revenue'); // Báo cáo doanh thu
+});
 require __DIR__.'/auth.php';

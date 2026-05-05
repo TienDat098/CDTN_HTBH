@@ -29,6 +29,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('promotions');
+         Schema::table('promotions', function (Blueprint $table) {
+        $table->dropColumn(['quantity', 'used_count']);
+    });
     }
 };

@@ -4,7 +4,8 @@
 @section('content')
 <div class="d-flex flex-column align-items-center justify-content-center min-vh-75">
     
-    <div class="w-100" style="max-width: 800px;"> <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="w-100" style="max-width: 800px;"> 
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold text-dark"> Nhập hàng vào kho</h2>
             <a href="{{ route('admin.inventory.index') }}" class="btn btn-outline-secondary px-4">
                 Quay lại
@@ -12,22 +13,30 @@
         </div>
 
         <div class="card shadow border-0 rounded-3">
-            <div class="card-body p-5"> <form action="{{ route('admin.inventory.store') }}" method="POST">
+            <div class="card-body p-5"> 
+                <form action="{{ route('admin.inventory.store') }}" method="POST">
                     @csrf
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold fs-5">Chọn Sản phẩm cần nhập</label>
-                        <select name="product_id" class="form-select form-select-lg" required>
-                            <option value=""> Chọn sản phẩm </option>
+                        <label class="form-label fw-bold fs-5">Chọn Sản phẩm / Phân loại cần nhập</label>
+                        <select name="item_data" class="form-select form-select-lg" required>
+                            <option value=""> -- Tìm sản phẩm hoặc phân loại -- </option>
+                            
                             @foreach($products as $product)
-                                <option value="{{ $product->id }}">
-                                    [{{ $product->barcode }}] - {{ $product->name }} 
-                                    (Hiện có: {{ $product->stock->quantity ?? 0 }})
-                                </option>
+                                <optgroup label=" {{ $product->name }}">
+                                    <option value="{{ $product->id }}-0">
+                                        [BÁN LẺ] - Hiện có: {{ $product->stock->quantity ?? 0 }} {{ $product->unit }}
+                                    </option>
+
+                                    @foreach($product->variants as $variant)
+                                        <option value="{{ $product->id }}-{{ $variant->id }}">
+                                            └─ [BIẾN THỂ: {{ mb_strtoupper($variant->name) }}] - Hiện có: {{ $variant->stock_quantity }}
+                                        </option>
+                                    @endforeach
+                                </optgroup>
                             @endforeach
                         </select>
                     </div>
-
                     <div class="mb-4">
                         <label class="form-label fw-bold fs-5">Số lượng nhập thêm</label>
                         <input type="number" name="quantity" class="form-control form-control-lg" 

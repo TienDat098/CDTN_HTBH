@@ -82,7 +82,7 @@
                         <label class="fw-bold me-3">Số lượng:</label>
                         <div class="input-group border border-warning rounded" style="width: 140px;">
                             <button class="btn btn-light border-0 fw-bold fs-5" type="button" onclick="changeQty(-1)">-</button>
-                            <input type="number" class="form-control border-0 text-center fw-bold fs-5" id="quantity" value="1" min="1" readonly>
+                            <input type="number" class="form-control border-0 text-center fw-bold fs-5" id="quantity" value="1" min="1">
                             <button class="btn btn-light border-0 fw-bold fs-5" type="button" onclick="changeQty(1)">+</button>
                         </div>
                     </div>
@@ -218,7 +218,23 @@
     if(radios.length > 0) {
         radios[0].dispatchEvent(new Event('change'));
     }
+    let isFixingQuantity = false;
+    qtyInput.addEventListener('change', function() {
+        let currentVal = parseInt(this.value);
+        let maxStockElement = document.getElementById('display-stock');
+        
+        if(!maxStockElement) return; 
+        
+        let maxStock = parseInt(maxStockElement.innerText);
 
+        if (isNaN(currentVal) || currentVal < 1) {
+            this.value = 1;
+        } else if (currentVal > maxStock) {
+            isFixingQuantity = true;
+            alert('Xin lỗi, số lượng bạn chọn đã vượt quá tồn kho hiện tại (Tối đa: ' + maxStock + ')!');
+            this.value = maxStock;
+        }
+    });
     function changeQty(amount) {
         let currentVal = parseInt(qtyInput.value);
         let maxStockElement = document.getElementById('display-stock');
@@ -238,6 +254,7 @@
     }
 
     function addToCart(isBuyNow) {
+        if (isFixingQuantity) return;
         let productId = document.getElementById('product_id').value;
         let qty = parseInt(document.getElementById('quantity').value);
         let selectedVariant = document.querySelector('.variant-radio:checked');

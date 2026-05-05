@@ -10,6 +10,15 @@
          Quay lại
     </a>
 </div>
+@if ($errors->any())
+    <div class="alert alert-danger shadow-sm border-0 border-start border-5 border-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data" class="bg-white p-4 shadow-sm rounded">
     @csrf
 
@@ -17,7 +26,10 @@
         <div class="col-md-12 mb-3">
             <label class="fw-bold">Mã vạch (Barcode) <span class="text-danger">*</span></label>
             <div class="input-group">
-                <input type="text" id="barcode-input" name="barcode" class="form-control" required>
+                <input type="text" id="barcode-input" name="barcode" class="form-control @error('barcode') is-invalid @enderror" value="{{ old('barcode') }}" required>
+                    @error('barcode')
+                        <div class="invalid-feedback fw-bold">{{ $message }}</div>
+                    @enderror
                 <button type="button" class="btn btn-outline-primary" id="btn-scan-barcode" onclick="startCamera()">
                     <i class="bi bi-camera-video"></i> Quét mã
                 </button>

@@ -1,7 +1,7 @@
 @extends('admin.layouts.app') 
 
 @section('content')
-<div class="container mt-4">
+<div class="container-fluid px-4 mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Chỉnh Sửa Bài Viết</h2>
         <a href="{{ route('admin.blogs.index') }}" class="btn btn-secondary">
@@ -11,10 +11,10 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <!-- Chú ý URL trỏ đến update và truyền ID -->
+           
             <form action="{{ route('admin.blogs.update', $blog->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('PUT') <!-- Bắt buộc phải có khi update trong Laravel -->
+                @method('PUT') 
 
                 <div class="row">
                     <div class="col-md-8">
