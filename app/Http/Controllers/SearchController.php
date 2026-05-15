@@ -22,11 +22,11 @@ class SearchController extends Controller
         $keyword = $request->keyword;
 
         $products = Product::where('name', 'like', "%$keyword%")
-            ->select('id', 'name', 'sell_price as price', 'slug', 'image') // Thêm cột 'image' vào đây
+            ->select('id', 'name', 'sell_price as price', 'slug', 'image') 
             ->limit(5)
             ->get()
             ->map(function($product) {
-                // Tạo đường dẫn ảnh đầy đủ, nếu không có ảnh thì dùng ảnh mặc định
+                
                 $product->thumbnail = $product->image ? asset('storage/' . $product->image) : asset('images/no-image.png'); 
                 return $product;
             });

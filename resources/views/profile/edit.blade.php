@@ -20,6 +20,12 @@
 
                 <!-- Menu Sidebar -->
                 <div class="list-group list-group-flush text-start custom-sidebar-menu">
+                    @if(Auth::user()->role === 'admin' || Auth::user()->role === 'staff')
+                        <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action text-white bg-danger mb-2 rounded border-0 fw-bold shadow-sm">
+                            <i class="bi bi-speedometer2 me-2"></i> Về Trang quản trị
+                        </a>
+                    @endif
+
                     <a href="{{ route('profile.edit') }}" class="list-group-item list-group-item-action active">
                         <i class="bi bi-person-fill me-2"></i> Hồ sơ của tôi
                     </a>
@@ -73,51 +79,13 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center mt-4">
-                        <a href="#" class="text-decoration-none text-secondary fw-bold">
-                            <i class="bi bi-key-fill me-1"></i> Đổi mật khẩu?
-                        </a>
-                        <button type="submit" class="btn btn-primary px-4 fw-bold">Lưu thay đổi</button>
-                    </div>
+            
                 </form>
 
             </div>
         </div>
 
-        <!-- BLOCK 2: SỔ ĐỊA CHỈ -->
-        <div class="card shadow-sm border-0 mb-5">
-            <div class="card-header bg-white border-bottom-0 pt-4 pb-2 d-flex justify-content-between align-items-center">
-                <h5 class="text-primary fw-bold mb-0">Sổ địa chỉ</h5>
-                <button class="btn btn-outline-primary btn-sm px-3 fw-bold">
-                    <i class="bi bi-plus-lg"></i> Thêm mới
-                </button>
-            </div>
-            <div class="card-body">
-                <hr class="mt-0 mb-3 text-muted">
-                
-                <div class="d-flex justify-content-between align-items-start py-2">
-                    <div>
-                        <div class="mb-1 d-flex align-items-center flex-wrap gap-2">
-                            <span class="fw-bold text-dark">{{ Auth::user()->name }}</span>
-                            <span class="text-muted border-start border-2 ps-2">{{ Auth::user()->phone ?? 'Chưa cập nhật SĐT' }}</span>
-                            <span class="badge bg-success">Mặc định</span>
-                        </div>
-                        <div class="text-muted small mt-1">
-                            {{ Auth::user()->address ?? 'Chưa cập nhật địa chỉ' }}
-                        </div>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-link text-dark p-0 text-decoration-none" data-bs-toggle="dropdown">
-                            <i class="bi bi-three-dots-vertical fs-5"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                            <li><a class="dropdown-item" href="#">Sửa</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+        
 
     </div>
 </div>

@@ -61,26 +61,29 @@
 
 
     <!-- Account -->
-    <div class="nav-icon dropdown">
-        
-        @auth
-            <a href="#" class="icon-box dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-person-circle text-warning"></i>
-                <div>
-                    <small>Xin chào,</small><br>
-                    <span class="fw-bold">{{ Auth::user()->name }}</span>
-                </div>
-            </a>
-            
-            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'staff')
-                    <li>
-                        <a class="dropdown-item py-2 fw-bold text-primary" href="{{ route('admin.dashboard') }}">
-                            <i class="bi bi-speedometer2 me-2"></i>Trang quản trị
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                @else
+    <!-- Account -->
+        <div class="nav-icon dropdown">
+            @auth
+                <a href="#" class="icon-box dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle text-warning"></i>
+                    <div>
+                        <small>Xin chào,</small><br>
+                        <span class="fw-bold">{{ Auth::user()->name }}</span>
+                    </div>
+                </a>
+                
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                    <!-- 1. Menu dành riêng cho Admin/Staff -->
+                    @if(Auth::user()->role === 'admin' || Auth::user()->role === 'staff')
+                        <li>
+                            <a class="dropdown-item py-2 fw-bold text-danger bg-light" href="{{ route('admin.dashboard') }}">
+                                <i class="bi bi-speedometer2 me-2"></i>Trang quản trị (Admin)
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                    @endif
+                    
+                    <!-- 2. Menu dùng chung cho TẤT CẢ mọi người (Hồ sơ & Đơn mua) -->
                     <li>
                         <a class="dropdown-item py-2 fw-bold text-primary" href="{{ route('profile.edit') }}">
                             <i class="bi bi-person-vcard me-2"></i>Hồ sơ cá nhân
@@ -92,29 +95,28 @@
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>
-                @endif
-                
-                <li>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button class="dropdown-item py-2 text-danger" type="submit">
-                            <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
-                        </button>
-                    </form>
-                </li>
-            </ul>
+                    
+                    <!-- Nút Đăng xuất -->
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button class="dropdown-item py-2 text-danger" type="submit">
+                                <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                            </button>
+                        </form>
+                    </li>
+                </ul>
 
-        @else
-            <a href="{{ route('login') }}" class="icon-box">
-                <i class="bi bi-person"></i>
-                <div>
-                    <small>Đăng nhập / Đăng ký</small><br>
-                    <span>Tài khoản</span>
-                </div>
-            </a>
-        @endauth
-
-    </div>
+            @else
+                <a href="{{ route('login') }}" class="icon-box">
+                    <i class="bi bi-person"></i>
+                    <div>
+                        <small>Đăng nhập / Đăng ký</small><br>
+                        <span>Tài khoản</span>
+                    </div>
+                </a>
+            @endauth
+        </div>
 
 
     <!-- Cart -->

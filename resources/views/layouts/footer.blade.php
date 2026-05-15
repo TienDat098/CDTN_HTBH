@@ -9,8 +9,8 @@
                     Hệ thống siêu thị tạp hóa online uy tín, cung cấp các sản phẩm thiết yếu chất lượng cao, giá cả bình ổn. Cam kết giao hàng nhanh chóng và phục vụ tận tâm.
                 </p>
                 <ul class="list-unstyled text-muted">
-                    <li class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i> 123 Đường ABC, Quận 1, TP. HCM</li>
-                    <li class="mb-2"><i class="bi bi-telephone text-primary me-2"></i> 0123.456.789</li>
+                    <li class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i> 123 Đường 2/4, Nha Trang, Khánh Hòa</li>
+                    <li class="mb-2"><i class="bi bi-telephone text-primary me-2"></i> 0293819385</li>
                     <li class="mb-2"><i class="bi bi-envelope text-primary me-2"></i> hotro@webtaphoa.com</li>
                 </ul>
             </div>
@@ -31,11 +31,10 @@
             <div class="col-lg-3 col-md-6 mb-4">
                 <h6 class="fw-bold mb-3 text-uppercase">Chính sách khách hàng</h6>
                 <ul class="list-unstyled footer-links">
-                    <li class="mb-2"><a href="#">Chính sách giao hàng</a></li>
-                    <li class="mb-2"><a href="#">Chính sách đổi trả</a></li>
-                    <li class="mb-2"><a href="#">Bảo mật thông tin</a></li>
-                    <li class="mb-2"><a href="#">Hướng dẫn mua hàng</a></li>
-                    <li class="mb-2"><a href="#">Câu hỏi thường gặp</a></li>
+                    <li class="mb-2"><a href="{{ url('/chinh-sach/giao-hang') }}">Giao hàng (GHN)</a></li>
+                    <li class="mb-2"><a href="{{ url('/chinh-sach/thanh-toan') }}">Thanh toán (ZaloPay)</a></li>
+                    <li class="mb-2"><a href="{{ url('/chinh-sach/doi-tra') }}">Đổi trả hàng</a></li>
+                    <li class="mb-2"><a href="{{ url('/chinh-sach/bao-mat') }}">Bảo mật thông tin</a></li>
                 </ul>
             </div>
 

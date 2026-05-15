@@ -135,7 +135,7 @@
 </div>
 
 <div class="text-center mt-4 mb-5">
-    <a href="#" class="btn btn-primary rounded-pill px-5 py-2 fw-bold btn-xem-them shadow fs-6">
+    <a href="{{ route('product.index') }}" class="btn btn-primary rounded-pill px-5 py-2 fw-bold btn-xem-them shadow fs-6">
         Xem thêm sản phẩm <i class="bi bi-arrow-right fw-bold ms-1"></i>
     </a>
 </div>
