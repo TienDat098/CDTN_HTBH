@@ -67,6 +67,8 @@
                 <form method="post" action="{{ route('profile.update') }}">
                     @csrf
                     @method('patch')
+                    
+                    <input type="hidden" name="email" value="{{ Auth::user()->email }}">
 
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3 mb-md-0">
@@ -79,7 +81,11 @@
                         </div>
                     </div>
 
-            
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">
+                            <i class="bi bi-floppy-fill me-2"></i> Lưu thay đổi
+                        </button>
+                    </div>
                 </form>
 
             </div>

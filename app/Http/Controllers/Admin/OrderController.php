@@ -81,22 +81,32 @@ class OrderController extends Controller
 
         //  NGHIỆP VỤ HỦY ĐƠN VÀ HOÀN KHO
         if ($newStatus == 'cancelled') {
-            // Sử dụng $order->items theo đúng relation của bạn
             foreach ($order->items as $item) {
-                // Cộng lại số lượng vào kho
-                ProductStock::where('product_id', $item->product_id)
-                    ->where('variant_id', $item->variant_id) 
-                    ->increment('quantity', $item->quantity);
+                // 1. Cộng lại số lượng vào kho (ProductStock)
+                $stockQuery = ProductStock::where('product_id', $item->product_id)
+                                          ->where('variant_id', $item->variant_id);
+                $stockQuery->increment('quantity', $item->quantity);
 
-                
+                // 2. (Quan trọng) Đồng bộ luôn vào bảng ProductVariant nếu có biến thể
+                if ($item->variant_id) {
+                    \App\Models\ProductVariant::where('id', $item->variant_id)
+                        ->increment('stock_quantity', $item->quantity);
+                }
+
+                // 3. Lấy ra số dư tồn kho MỚI NHẤT sau khi đã cộng
+                $freshStock = $stockQuery->first();
+                $balanceAfter = $freshStock ? $freshStock->quantity : $item->quantity;
+
+                // 4. Ghi Log và ĐƯA BIẾN $balanceAfter VÀO ĐÚNG CỘT
                 InventoryLog::create([
-                    'product_id' => $item->product_id,
-                    'variant_id' => $item->variant_id,
-                    'reference_id' => $order->id,
-                    'quantity' => $item->quantity,
-                    'type' => 'import',
-                    'note' => 'Hoàn kho do Hủy đơn hàng ' . $order->order_code,
-                    'created_by' => auth()->id() ?? 1
+                    'product_id'    => $item->product_id,
+                    // 'variant_id' => $item->variant_id, // Mở comment nếu bảng InventoryLog của bạn có cột này
+                    'reference_id'  => $order->id,
+                    'quantity'      => $item->quantity,
+                    'balance_after' => $balanceAfter, // Dòng này là chìa khóa để hết bị số 0
+                    'type'          => 'import',
+                    'note'          => 'Hoàn kho do Hủy đơn hàng ' . $order->order_code,
+                    'created_by'    => auth()->id() ?? 1
                 ]);
             }
         }

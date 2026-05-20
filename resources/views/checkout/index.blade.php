@@ -52,22 +52,31 @@
                         </div>
                         <div class="p-3">
                             <div class="mb-3">
-                                <input type="text" name="shipping_address" class="form-control form-control-lg @error('shipping_address') is-invalid @enderror" 
-                                       value="{{ auth()->check() ? auth()->user()->address : old('shipping_address') }}" 
-                                       placeholder="Địa chỉ (Số nhà, Tên đường...)" required>
-                                @error('shipping_address') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <input type="text" id="street_address" class="form-control form-control-lg" 
+                                    placeholder="Địa chỉ cụ thể (Số nhà, Tên đường...)" required>
+                                
+                                <input type="hidden" name="shipping_address" id="full_shipping_address" 
+                                    value="{{ auth()->check() ? auth()->user()->address : old('shipping_address') }}">
+                                
+                                @error('shipping_address') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <select class="form-select form-select-lg text-muted">
-                                        <option selected>Tỉnh / thành</option>
-                                        <option value="1">Hồ Chí Minh</option>
-                                        <option value="2">Hà Nội</option>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-4">
+                                    <select id="province" class="form-select form-select-lg text-muted" required>
+                                        <option value="" selected disabled>Tỉnh / thành</option>
                                     </select>
                                 </div>
-                                <div class="col-md-6">
-                                    <select class="form-select form-select-lg text-muted">
-                                        <option selected>Quận / huyện</option>
+                                
+                                <div class="col-md-4">
+                                    <select id="district" class="form-select form-select-lg text-muted" disabled required>
+                                        <option value="" selected disabled>Quận / huyện</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <select id="ward" class="form-select form-select-lg text-muted" disabled required>
+                                        <option value="" selected disabled>Phường / xã</option>
                                     </select>
                                 </div>
                             </div>
@@ -249,5 +258,79 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+
+
+// ========================================================
+    // TÍCH HỢP API ĐỊA CHỈ HÀNH CHÍNH VIỆT NAM
+    // ========================================================
+    const provinceSelect = document.getElementById('province');
+    const districtSelect = document.getElementById('district');
+    const wardSelect = document.getElementById('ward');
+    const streetInput = document.getElementById('street_address');
+    const fullAddressInput = document.getElementById('full_shipping_address');
+
+    // 1. Gọi API lấy danh sách Tỉnh/Thành ngay khi load trang
+    fetch('https://provinces.open-api.vn/api/p/')
+        .then(res => res.json())
+        .then(data => {
+            data.forEach(p => {
+                // Lưu tên tỉnh vào data-name để lát nối chuỗi
+                provinceSelect.innerHTML += `<option value="${p.code}" data-name="${p.name}">${p.name}</option>`;
+            });
+        });
+
+    // 2. Xử lý khi chọn Tỉnh/Thành -> Load danh sách Quận/Huyện
+    provinceSelect.addEventListener('change', function() {
+        districtSelect.innerHTML = '<option value="" selected disabled>Quận / huyện</option>';
+        wardSelect.innerHTML = '<option value="" selected disabled>Phường / xã</option>';
+        districtSelect.disabled = false;
+        wardSelect.disabled = true;
+
+        fetch(`https://provinces.open-api.vn/api/p/${this.value}?depth=2`)
+            .then(res => res.json())
+            .then(data => {
+                data.districts.forEach(d => {
+                    districtSelect.innerHTML += `<option value="${d.code}" data-name="${d.name}">${d.name}</option>`;
+                });
+            });
+        compileFullAddress();
+    });
+
+    // 3. Xử lý khi chọn Quận/Huyện -> Load danh sách Phường/Xã
+    districtSelect.addEventListener('change', function() {
+        wardSelect.innerHTML = '<option value="" selected disabled>Phường / xã</option>';
+        wardSelect.disabled = false;
+
+        fetch(`https://provinces.open-api.vn/api/d/${this.value}?depth=2`)
+            .then(res => res.json())
+            .then(data => {
+                data.wards.forEach(w => {
+                    wardSelect.innerHTML += `<option value="${w.code}" data-name="${w.name}">${w.name}</option>`;
+                });
+            });
+        compileFullAddress();
+    });
+
+    // 4. Lắng nghe sự kiện để nối chuỗi địa chỉ tự động
+    wardSelect.addEventListener('change', compileFullAddress);
+    streetInput.addEventListener('input', compileFullAddress);
+
+    // 5. Hàm gộp các trường thành 1 chuỗi hoàn chỉnh lưu vào thẻ Input ẩn
+    function compileFullAddress() {
+        let street = streetInput.value.trim();
+        let pName = provinceSelect.options[provinceSelect.selectedIndex]?.dataset?.name || '';
+        let dName = districtSelect.options[districtSelect.selectedIndex]?.dataset?.name || '';
+        let wName = wardSelect.options[wardSelect.selectedIndex]?.dataset?.name || '';
+
+        let addressParts = [];
+        if (street) addressParts.push(street);
+        if (wName)  addressParts.push(wName);
+        if (dName)  addressParts.push(dName);
+        if (pName)  addressParts.push(pName);
+
+        // Nối bằng dấu phẩy. VD: "45 Lê Lợi, Phường Vạn Thạnh, Thành phố Nha Trang, Tỉnh Khánh Hòa"
+        fullAddressInput.value = addressParts.join(', ');
+    }
 </script>
 @endsection

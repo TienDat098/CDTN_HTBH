@@ -168,7 +168,7 @@
                                         </div>
 
                                         <div class="mb-2">
-                                            <label class="form-label fw-bold small">Nội dung phản hồi (HTML) <span class="text-danger">*</span></label>
+                                            <label class="form-label fw-bold small">Nội dung phản hồi <span class="text-danger">*</span></label>
                                             <textarea name="reply_content" class="form-control" rows="8" required>Chào {{ $contact->name }},
 
                     Cảm ơn quý khách đã liên hệ với WebTapHoa. Về vấn đề quý khách thắc mắc, chúng tôi xin phản hồi như sau:

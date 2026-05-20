@@ -38,7 +38,7 @@
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <input type="number" name="min_price" class="form-control form-control-sm text-center" placeholder="0đ" value="{{ request('min_price') }}">
                             <span class="text-muted">-</span>
-                            <input type="number" name="max_price" class="form-control form-control-sm text-center" placeholder="5,000,000đ" value="{{ request('max_price') }}">
+                            <input type="number" name="max_price" class="form-control form-control-sm text-center" placeholder="1,000,000đ" value="{{ request('max_price') }}">
                         </div>
                         <button type="submit" class="btn btn-outline-primary btn-sm w-100 mt-2">Áp dụng</button>
                     </form>

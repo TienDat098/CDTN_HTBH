@@ -2,10 +2,11 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin - @yield('title')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* Tùy chỉnh làm đẹp Sidebar */
         .sidebar { background-color: #ffffff; box-shadow: 2px 0 5px rgba(0,0,0,0.05); z-index: 1000; }
@@ -41,7 +42,14 @@
                         <i class="bi bi-speedometer2 me-2"></i> Dashboard
                     </a>
                 </li>
-
+                <li class="nav-item mb-1">
+                    <a href="{{ route('admin.chat') ?? '#' }}" class="nav-link {{ request()->routeIs('admin.chat') ? 'active' : '' }} d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-chat-dots-fill me-2 text-success"></i> Tin nhắn hỗ trợ
+                        </div>
+                        <span id="unread-badge" class="badge bg-danger rounded-pill d-none">0</span>
+                    </a>
+                </li>
                 @php $isProductActive = request()->routeIs('admin.categories.*', 'admin.brands.*', 'admin.products.*', 'admin.inventory.*'); @endphp
                 <li class="nav-item mb-1">
                     <a class="nav-link d-flex justify-content-between align-items-center {{ $isProductActive ? 'text-primary' : '' }}" 
@@ -168,6 +176,42 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+    /* CSS hiệu ứng rung lắc khi có tin nhắn mới */
+    @keyframes shakeBadge {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-3px); }
+        50% { transform: translateX(3px); }
+        75% { transform: translateX(-3px); }
+        100% { transform: translateX(0); }
+    }
+</style>
 
+<script type="module">
+    // Lắng nghe kênh chat chung
+    window.Echo.channel('chat-channel')
+        .listen('.message.sent', (e) => {
+            
+            // Kiểm tra: Nếu người gửi KHÔNG PHẢI là Admin hiện tại thì mới nhảy số
+            const currentUserId = {{ auth()->id() ?? 'null' }};
+            
+            if (e.message.sender_id !== currentUserId) {
+                
+                const badge = document.getElementById('unread-badge');
+                if (badge) {
+                    // Lấy số hiện tại, nếu chưa có thì tính là 0
+                    let currentCount = parseInt(badge.innerText) || 0;
+                    
+                    // Cộng thêm 1 và hiển thị ra
+                    badge.innerText = currentCount + 1;
+                    badge.classList.remove('d-none');
+                    
+                    // Kích hoạt hiệu ứng rung lắc
+                    badge.style.animation = "shakeBadge 0.5s";
+                    setTimeout(() => { badge.style.animation = ""; }, 500);
+                }
+            }
+        });
+</script>
 </body>
 </html>

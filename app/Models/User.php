@@ -63,4 +63,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(Blog::class, 'author_id');
     }
+    /**
+     * Lấy tất cả tin nhắn người dùng này đã gửi
+     */
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    /**
+     * Lấy tất cả tin nhắn người dùng này nhận được
+     */
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
 }

@@ -13,6 +13,7 @@ use App\Http\Controllers\ProductController as ClientProductController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\PromotionController;
 use App\Http\Controllers\Admin\StoreController;
+use App\Http\Controllers\ChatController;
 
 // Trang chủ 
 Route::get('/', [App\Http\Controllers\StoreController::class, 'index'])->name('home');
@@ -62,6 +63,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/{id}/reorder', [UserOrderController::class, 'reorder'])->name('orders.reorder');
 });
 
+Route::middleware(['web'])->group(function () {
+    Route::get('/chat/messages/{receiver_id}', [ChatController::class, 'fetchMessages']);
+    Route::post('/chat/messages', [ChatController::class, 'sendMessage']);
+});
 // Admin
 Route::prefix('admin')
     ->name('admin.')
@@ -87,6 +92,7 @@ Route::prefix('admin')
         Route::get('/pos', [\App\Http\Controllers\Admin\PosController::class, 'index'])->name('pos.index');
         Route::post('/pos/checkout', [\App\Http\Controllers\Admin\PosController::class, 'checkout'])->name('pos.checkout');
         Route::get('/pos/check-customer', [\App\Http\Controllers\Admin\PosController::class, 'checkCustomer'])->name('pos.checkCustomer');
+        Route::get('/chat', [App\Http\Controllers\ChatController::class, 'adminChat'])->name('chat');
 });
 //  CHỈ CÓ ADMIN
 Route::prefix('admin')
