@@ -84,8 +84,13 @@
     
     <div class="chat-footer p-2 bg-white border-top d-flex rounded-bottom">
         <input type="text" id="chat-input" class="form-control me-2 border-0" placeholder="Nhập tin nhắn..." onkeypress="handleEnter(event)">
-        <button class="btn btn-primary rounded-circle" onclick="sendMessage()">
+        
+        <button class="btn btn-primary rounded-circle me-1" onclick="sendMessage()" title="Gửi cho Admin">
             <i class="bi bi-send-fill"></i>
+        </button>
+        
+        <button class="btn btn-success rounded-circle" onclick="askAI()" title="Hỏi Trợ lý AI">
+            <i class="bi bi-robot"></i>
         </button>
     </div>
 </div>
@@ -152,12 +157,73 @@
         });
     };
 
+    // ==========================================
+    // HÀM GỌI TRỢ LÝ ẢO AI (GEMINI)
+    // ==========================================
+    window.askAI = function() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (text === '') {
+            alert('Vui lòng nhập câu hỏi để Trợ lý AI tư vấn nhé!');
+            input.focus();
+            return;
+        }
+
+        // 1. Xóa ô nhập và in câu hỏi của khách lên màn hình
+        input.value = '';
+        appendMessage(text, 'sender');
+
+        // 2. Tạo hiệu ứng "AI đang gõ chữ..." để khách chờ
+        const chatBody = document.getElementById('chat-body');
+        const loadingId = 'loading-' + Date.now();
+        const loadingHtml = `
+            <div id="${loadingId}" class="message-row receiver mb-2 d-flex flex-column">
+                <div class="small text-muted mb-1" style="font-size: 11px; margin-left: 5px;">Trợ lý AI 🤖</div>
+                <div class="message-bubble shadow-sm bg-light border text-muted">
+                    <em>Đang suy nghĩ... <span class="spinner-grow spinner-grow-sm text-success" role="status"></span></em>
+                </div>
+            </div>`;
+        chatBody.insertAdjacentHTML('beforeend', loadingHtml);
+        scrollToBottom();
+
+        // 3. Gửi câu hỏi lên ChatbotController
+        fetch('{{ route('chatbot.ask') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ message: text })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Xóa hiệu ứng "Đang suy nghĩ"
+            document.getElementById(loadingId).remove();
+
+            if (data.success) {
+                // In câu trả lời của AI ra
+                appendMessage(data.bot_response, 'receiver', 'Trợ lý AI 🤖');
+            } else {
+                appendMessage("Xin lỗi, AI đang bảo trì: " + data.message, 'receiver', 'Hệ thống');
+            }
+        })
+        .catch(error => {
+            document.getElementById(loadingId).remove();
+            appendMessage("Lỗi kết nối mạng khi gọi AI.", 'receiver', 'Hệ thống');
+            console.error('Lỗi AI:', error);
+        });
+    };
+
     window.appendMessage = function(text, type, name = null) {
         const chatBody = document.getElementById('chat-body');
         const row = document.createElement('div');
         row.className = `message-row ${type} mb-2 d-flex flex-column`; 
+        // 1. Chuyển đổi dấu ** thành thẻ in đậm HTML, và \n thành thẻ <br> xuống dòng
+        let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        formattedText = formattedText.replace(/\n/g, '<br>');
         let nameHtml = name ? `<div class="small text-muted mb-1" style="font-size: 11px; margin-${type === 'sender' ? 'right' : 'left'}: 5px;">${name}</div>` : '';
-        row.innerHTML = `${nameHtml}<div class="message-bubble shadow-sm">${text}</div>`;
+        // 2. Thay biến ${text} cũ thành ${formattedText}
+        row.innerHTML = `${nameHtml}<div class="message-bubble shadow-sm">${formattedText}</div>`;
         chatBody.appendChild(row);
         scrollToBottom();
     };
@@ -193,47 +259,7 @@
         }
     });
 </script>
-<script type="module">
-    // Lắng nghe kênh chat chung
-    window.Echo.channel('chat-channel')
-        .listen('.message.sent', (e) => {
-            
-            // 1. Kiểm tra xem người gửi CÓ PHẢI LÀ ADMIN KHÔNG?
-            // (Nếu Admin tự gửi thì không tăng số đếm)
-            const currentUserId = {{ auth()->id() ?? 'null' }};
-            
-            if (e.message.sender_id !== currentUserId) {
-                
-                // 2. Lấy thẻ bong bóng đỏ ra
-                const badge = document.getElementById('unread-badge');
-                
-                if (badge) {
-                    // Lấy số hiện tại, nếu chưa có thì tính là 0
-                    let currentCount = parseInt(badge.innerText) || 0;
-                    
-                    // Cộng thêm 1
-                    badge.innerText = currentCount + 1;
-                    
-                    // Hiển thị bong bóng lên (Xóa class d-none)
-                    badge.classList.remove('d-none');
-                    
-                    // Tùy chọn: Thêm hiệu ứng rung lắc nhẹ để thu hút sự chú ý
-                    badge.style.animation = "shake 0.5s";
-                    setTimeout(() => { badge.style.animation = ""; }, 500);
-                }
-            }
-        });
-</script>
 
-<style>
-    /* CSS hiệu ứng rung lắc (Thêm vào thẻ style của bạn) */
-    @keyframes shake {
-        0% { transform: translateX(0); }
-        25% { transform: translateX(-3px); }
-        50% { transform: translateX(3px); }
-        75% { transform: translateX(-3px); }
-        100% { transform: translateX(0); }
-    }
-</style>
+
 </body>
 </html>

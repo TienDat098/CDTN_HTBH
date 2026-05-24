@@ -14,13 +14,14 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\PromotionController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\ChatController;
-
+use App\Http\Controllers\ChatbotController;
 // Trang chủ 
 Route::get('/', [App\Http\Controllers\StoreController::class, 'index'])->name('home');
 
 // Danh mục sản phẩm
 Route::get('/danh-muc/{slug}', [CategoryController::class, 'show'])->name('category.show');
-
+// Chatbot
+Route::post('/chatbot/ask', [ChatbotController::class, 'askGemini'])->name('chatbot.ask');
 // Giỏ hàng
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
@@ -93,6 +94,10 @@ Route::prefix('admin')
         Route::post('/pos/checkout', [\App\Http\Controllers\Admin\PosController::class, 'checkout'])->name('pos.checkout');
         Route::get('/pos/check-customer', [\App\Http\Controllers\Admin\PosController::class, 'checkCustomer'])->name('pos.checkCustomer');
         Route::get('/chat', [App\Http\Controllers\ChatController::class, 'adminChat'])->name('chat');
+        // BÊN TRONG QUẢN TRỊ ADMIN CỦA BẠN
+        Route::get('/ai/history', [App\Http\Controllers\Admin\AiManagementController::class, 'history'])->name('ai.history');
+        Route::get('/ai/settings', [App\Http\Controllers\Admin\AiManagementController::class, 'settings'])->name('ai.settings');
+        Route::post('/ai/settings', [App\Http\Controllers\Admin\AiManagementController::class, 'updateSettings'])->name('ai.update');
 });
 //  CHỈ CÓ ADMIN
 Route::prefix('admin')

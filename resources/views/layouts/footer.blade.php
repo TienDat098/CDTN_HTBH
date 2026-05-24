@@ -31,8 +31,8 @@
             <div class="col-lg-3 col-md-6 mb-4">
                 <h6 class="fw-bold mb-3 text-uppercase">Chính sách khách hàng</h6>
                 <ul class="list-unstyled footer-links">
-                    <li class="mb-2"><a href="{{ url('/chinh-sach/giao-hang') }}">Giao hàng (GHN)</a></li>
-                    <li class="mb-2"><a href="{{ url('/chinh-sach/thanh-toan') }}">Thanh toán (ZaloPay)</a></li>
+                    <li class="mb-2"><a href="{{ url('/chinh-sach/giao-hang') }}">Giao hàng</a></li>
+                    <li class="mb-2"><a href="{{ url('/chinh-sach/thanh-toan') }}">Thanh toán (VietQR)</a></li>
                     <li class="mb-2"><a href="{{ url('/chinh-sach/doi-tra') }}">Đổi trả hàng</a></li>
                     <li class="mb-2"><a href="{{ url('/chinh-sach/bao-mat') }}">Bảo mật thông tin</a></li>
                 </ul>
