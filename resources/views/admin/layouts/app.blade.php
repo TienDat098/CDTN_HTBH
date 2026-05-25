@@ -293,7 +293,12 @@
                                     <i class="bi bi-chevron-right me-1 small"></i> Liên hệ
                                 </a>
                             </li>
-
+                           <li class="nav-item">
+                            <a href="{{ route('admin.livestreams.index') }}"
+                            class="nav-link {{ request()->routeIs('admin.livestreams.*') ? 'active' : '' }}">
+                                <i class="bi bi-chevron-right me-1 small"></i> Livestream
+                            </a>
+                        </li>
                         </ul>
                     </div>
                 </li>

@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\PromotionController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\Admin\LivestreamController;
+use App\Http\Controllers\LivestreamPageController;
 // Trang chủ 
 Route::get('/', [App\Http\Controllers\StoreController::class, 'index'])->name('home');
 
@@ -63,11 +65,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/orders/{id}', [UserOrderController::class, 'show'])->name('profile.orders.show');
     Route::post('/orders/{id}/reorder', [UserOrderController::class, 'reorder'])->name('orders.reorder');
 });
+// Livestream
+Route::get('/livestream', [LivestreamPageController::class, 'index'])
+    ->name('livestream.index');
 
 Route::middleware(['web'])->group(function () {
     Route::get('/chat/messages/{receiver_id}', [ChatController::class, 'fetchMessages']);
     Route::post('/chat/messages', [ChatController::class, 'sendMessage']);
 });
+
 // Admin
 Route::prefix('admin')
     ->name('admin.')
@@ -84,6 +90,8 @@ Route::prefix('admin')
         Route::resource('promotions', \App\Http\Controllers\Admin\PromotionController::class);
         // Quản lý bài viết
         Route::resource('blogs', \App\Http\Controllers\Admin\BlogController::class);
+        // Quản lý livestream
+         Route::resource('livestreams', LivestreamController::class);
         // Quản lý liên hệ
         Route::get('/contacts', [\App\Http\Controllers\Admin\ContactController::class, 'index'])->name('contacts.index');
         Route::patch('/contacts/{id}/status', [\App\Http\Controllers\Admin\ContactController::class, 'updateStatus'])->name('contacts.update_status');
@@ -98,6 +106,7 @@ Route::prefix('admin')
         Route::get('/ai/history', [App\Http\Controllers\Admin\AiManagementController::class, 'history'])->name('ai.history');
         Route::get('/ai/settings', [App\Http\Controllers\Admin\AiManagementController::class, 'settings'])->name('ai.settings');
         Route::post('/ai/settings', [App\Http\Controllers\Admin\AiManagementController::class, 'updateSettings'])->name('ai.update');
+        
 });
 //  CHỈ CÓ ADMIN
 Route::prefix('admin')

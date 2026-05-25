@@ -147,6 +147,12 @@
                 <a class="nav-link text-uppercase fw-bold" href="{{ route('product.index') }}">Sản phẩm</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('livestream.index') ? 'active text-danger fw-bold' : '' }}"
+                href="{{ route('livestream.index') }}">
+                    <i class="bi bi-broadcast-pin me-1"></i> LIVESTREAM
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link text-uppercase fw-bold" href="{{ route('blogs.index') }}">Blog</a>
             </li>
             <li class="nav-item">
